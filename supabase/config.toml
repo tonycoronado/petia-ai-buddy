@@ -1,1 +1,4 @@
 project_id = "zglinoizmfijxhwtroxc"
+
+[functions.analyze-pet]
+verify_jwt = false
