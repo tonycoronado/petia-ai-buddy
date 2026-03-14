@@ -55,7 +55,7 @@ serve(async (req) => {
             ],
           },
         ],
-        max_tokens: 300,
+        max_completion_tokens: 300,
       }),
     });
 
