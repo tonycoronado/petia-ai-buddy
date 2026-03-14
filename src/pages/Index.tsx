@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import SplashScreen from "@/components/petia/SplashScreen";
 import HomeScreen from "@/components/petia/HomeScreen";
 import ScanScreen from "@/components/petia/ScanScreen";
-import ResultScreen from "@/components/petia/ResultScreen";
+import ResultScreen, { type AnalysisResult } from "@/components/petia/ResultScreen";
 import HistoryScreen from "@/components/petia/HistoryScreen";
 import ChatScreen from "@/components/petia/ChatScreen";
 import ProfileScreen from "@/components/petia/ProfileScreen";
@@ -37,11 +39,36 @@ const Index = () => {
   const [screen, setScreen] = useState("home");
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setSplashExit(true), 2500);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleAnalyze = async (base64: string) => {
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-pet", {
+        body: { imageBase64: base64 },
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setAnalysisResult(data as AnalysisResult);
+      setScreen("result");
+    } catch (err: any) {
+      console.error("Analysis error:", err);
+      toast.error(err.message || "Failed to analyze image. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="bg-background text-foreground font-sans min-h-screen max-w-md mx-auto relative overflow-hidden shadow-2xl">
@@ -52,7 +79,6 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* Delayed splash exit — unmount after animation */}
       {showSplash && splashExit && <SplashExiter onDone={() => setShowSplash(false)} />}
 
       {/* Main screens */}
@@ -62,6 +88,8 @@ const Index = () => {
             pets={PETS}
             onSelectPet={setSelectedPet}
             onScan={() => setScreen("scan")}
+            onAnalyze={handleAnalyze}
+            isAnalyzing={isAnalyzing}
           />
         )}
         {screen === "scan" && (
@@ -70,9 +98,13 @@ const Index = () => {
             onCapture={() => setScreen("result")}
           />
         )}
-        {screen === "result" && (
+        {screen === "result" && analysisResult && (
           <ResultScreen
-            onSave={() => setScreen("home")}
+            result={analysisResult}
+            onSave={() => {
+              toast.success("Saved to Max's profile!");
+              setScreen("home");
+            }}
             onChat={() => setShowPaywall(true)}
             onDismiss={() => setScreen("home")}
           />
@@ -102,7 +134,6 @@ const Index = () => {
   );
 };
 
-/** Tiny helper to let the splash exit animation play before unmounting */
 const SplashExiter = ({ onDone }: { onDone: () => void }) => {
   useEffect(() => {
     const t = setTimeout(onDone, 700);
