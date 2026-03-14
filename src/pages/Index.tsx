@@ -55,18 +55,31 @@ const Index = () => {
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      if (data?.error) {
-        throw new Error(data.error);
-      }
+      const safeResult: AnalysisResult = {
+        status:
+          data?.status === "Green" || data?.status === "Yellow" || data?.status === "Red"
+            ? data.status
+            : "Yellow",
+        title:
+          typeof data?.title === "string" && data.title.trim().length > 0
+            ? data.title
+            : "Analysis Pending",
+        description:
+          typeof data?.description === "string" && data.description.trim().length > 0
+            ? data.description
+            : "Could not process the image clearly. Please try again with better lighting.",
+      };
 
-      setAnalysisResult(data as AnalysisResult);
+      setAnalysisResult(safeResult);
       setScreen("result");
-    } catch (err: any) {
-      console.error("Analysis error:", err);
-      toast.error(err.message || "Failed to analyze image. Please try again.");
-    } finally {
       setIsAnalyzing(false);
+    } catch (error) {
+      console.error(error);
+      setIsAnalyzing(false);
+      toast.error("Error analyzing image. Please try again.");
+      return;
     }
   };
 
