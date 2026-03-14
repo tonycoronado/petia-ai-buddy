@@ -33,6 +33,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "gpt-5-mini",
+        response_format: { type: "json_object" },
         messages: [
           {
             role: "system",
@@ -43,14 +44,16 @@ serve(async (req) => {
             role: "user",
             content: [
               {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${imageBase64}`,
-                },
+                type: "text",
+                text: "Analyze this image for pet health or safety concerns. Respond in JSON.",
               },
               {
-                type: "text",
-                text: "Analyze this image for pet health or safety concerns.",
+                type: "image_url",
+                image_url: {
+                  url: imageBase64.startsWith("data:")
+                    ? imageBase64
+                    : `data:image/jpeg;base64,${imageBase64}`,
+                },
               },
             ],
           },
