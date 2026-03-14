@@ -75,9 +75,16 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    console.log("OpenAI full response:", JSON.stringify(data, null, 2));
+    
+    // Handle different response structures
+    const choice = data.choices?.[0];
+    const content = choice?.message?.content 
+      || choice?.text 
+      || (typeof choice?.message === "string" ? choice.message : null);
 
     if (!content) {
+      console.error("Unexpected response structure:", JSON.stringify(data));
       throw new Error("No content in OpenAI response");
     }
 
