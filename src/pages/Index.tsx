@@ -54,8 +54,40 @@ const Index = () => {
         body: { imageBase64: base64 },
       });
 
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (error) {
+        let backendMessage: string | null = null;
+        const context = (error as any)?.context;
+
+        if (context && typeof context.json === "function") {
+          try {
+            const payload = await context.json();
+            if (typeof payload?.message === "string" && payload.message.trim().length > 0) {
+              backendMessage = payload.message;
+            }
+          } catch {
+            // ignore parsing errors and use fallback message
+          }
+        }
+
+        throw new Error(
+          backendMessage ||
+            (error instanceof Error && error.message.trim().length > 0
+              ? error.message
+              : "Error analyzing image. Please try again.")
+        );
+      }
+
+      if (data?.error === true) {
+        throw new Error(
+          typeof data?.message === "string" && data.message.trim().length > 0
+            ? data.message
+            : "OpenAI API Error"
+        );
+      }
+
+      if (typeof data?.error === "string") {
+        throw new Error(data.error);
+      }
 
       const safeResult: AnalysisResult = {
         status:
@@ -78,7 +110,11 @@ const Index = () => {
     } catch (error) {
       console.error(error);
       setIsAnalyzing(false);
-      toast.error("Error analyzing image. Please try again.");
+      toast.error(
+        error instanceof Error && error.message.trim().length > 0
+          ? error.message
+          : "Error analyzing image. Please try again."
+      );
       return;
     }
   };
