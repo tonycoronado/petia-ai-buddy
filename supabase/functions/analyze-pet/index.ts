@@ -32,7 +32,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-5-mini",
+        model: "gpt-4o-mini",
         response_format: { type: "json_object" },
         messages: [
           {
@@ -62,22 +62,44 @@ serve(async (req) => {
       }),
     });
 
+    const rawOpenAIResponse = await response.text();
+    let aiResponse: any = null;
+
+    try {
+      aiResponse = JSON.parse(rawOpenAIResponse);
+    } catch {
+      aiResponse = null;
+    }
+
+    console.log("RAW OpenAI Response:", JSON.stringify(aiResponse ?? rawOpenAIResponse));
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
       return new Response(
-        JSON.stringify({ error: `OpenAI API error: ${response.status}` }),
+        JSON.stringify({
+          error: true,
+          message: aiResponse?.error?.message || `OpenAI API error: ${response.status}`,
+        }),
         {
-          status: 502,
+          status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
     }
 
-    const aiResponse = await response.json();
-    console.log("RAW OpenAI Response:", JSON.stringify(aiResponse));
+    if (aiResponse?.error) {
+      return new Response(
+        JSON.stringify({
+          error: true,
+          message: aiResponse.error.message || "OpenAI API Error",
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
-    const content = aiResponse.choices?.[0]?.message?.content;
+    const content = aiResponse?.choices?.[0]?.message?.content;
 
     if (!content || (typeof content === "string" && content.trim().length === 0)) {
       return new Response(
