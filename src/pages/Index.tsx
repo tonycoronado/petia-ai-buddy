@@ -120,7 +120,7 @@ const Index = () => {
   }, [user, pendingPetData]);
 
   const savePet = async (data: PetData) => {
-    const img = SPECIES_IMAGES[data.species] || SPECIES_IMAGES.dog;
+    const img = data.photoUrl || SPECIES_IMAGES[data.species] || SPECIES_IMAGES.dog;
     const { data: inserted, error } = await supabase
       .from("pets")
       .insert({
