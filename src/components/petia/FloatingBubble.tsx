@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 interface Pet {
-  id: number;
+  id: number | string;
   name: string;
   breed: string;
   age: string;
