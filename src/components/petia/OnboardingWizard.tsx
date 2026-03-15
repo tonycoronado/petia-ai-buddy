@@ -1,12 +1,13 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ChevronLeft, Camera } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import OnboardingStepName from "./onboarding/StepName";
 import OnboardingStepSpecies from "./onboarding/StepSpecies";
 import OnboardingStepAge from "./onboarding/StepAge";
 import OnboardingStepWeight from "./onboarding/StepWeight";
 import OnboardingStepPhoto from "./onboarding/StepPhoto";
+import OnboardingStepLoading from "./onboarding/StepLoading";
 import OnboardingStepAuth from "./onboarding/StepAuth";
 
 export interface PetData {
@@ -24,7 +25,7 @@ interface OnboardingWizardProps {
   onComplete: (data: PetData) => void;
 }
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 120 : -120, opacity: 0 }),
@@ -62,6 +63,9 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
     setPetData((d) => ({ ...d, ...patch }));
   }, []);
 
+  // Steps where back button is allowed (2-7, i.e. indices 1-6, but not on loading step 5)
+  const showBack = step > 0 && step !== 5 && step < TOTAL_STEPS - 1;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -71,7 +75,7 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
     >
       {/* Header: back + progress */}
       <div className="px-6 pt-12 pb-2 flex items-center gap-3">
-        {step > 0 && step < TOTAL_STEPS - 1 && (
+        {showBack && (
           <motion.button
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
@@ -119,6 +123,11 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
           )}
           {step === 5 && (
             <motion.div key="s5" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
+              <OnboardingStepLoading petData={petData} next={next} />
+            </motion.div>
+          )}
+          {step === 6 && (
+            <motion.div key="s6" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
               <OnboardingStepAuth petData={petData} onComplete={onComplete} />
             </motion.div>
           )}

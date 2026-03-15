@@ -81,10 +81,10 @@ const StepAuth = ({ petData, onComplete }: Props) => {
           </span>
 
           <h1 className="text-2xl font-black tracking-tight text-foreground mb-3">
-            Awesome! {petData.name}'s profile is ready.
+            Wonderful! {petData.name}'s profile is ready.
           </h1>
           <p className="text-muted-foreground font-medium mb-10 leading-relaxed text-sm">
-            Create your free account to save it and unlock the 24/7 AI Vet.
+            Create your free account to access it and unlock the 24/7 AI Vet.
           </p>
 
           <button
