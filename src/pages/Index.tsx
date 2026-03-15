@@ -159,11 +159,7 @@ const Index = () => {
   const handleOnboardingComplete = (data: PetData) => {
     setPendingPetData(data);
     setShowOnboarding(false);
-    setShowAuth(true);
-  };
-
-  const handleAuthSuccess = () => {
-    // Auth state change listener will handle the rest
+    // Auth state change listener + pendingPetData effect will handle saving
   };
 
   const handleAnalyze = async (base64: string) => {
