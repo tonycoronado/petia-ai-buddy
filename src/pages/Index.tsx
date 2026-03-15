@@ -14,7 +14,6 @@ import PetProfileSheet from "@/components/petia/PetProfileSheet";
 import PaywallScreen from "@/components/petia/PaywallScreen";
 import BottomNav from "@/components/petia/BottomNav";
 import OnboardingWizard, { type PetData } from "@/components/petia/OnboardingWizard";
-import AuthScreen from "@/components/petia/AuthScreen";
 import type { Pet } from "@/components/petia/FloatingBubble";
 
 const SPECIES_IMAGES: Record<string, string> = {
