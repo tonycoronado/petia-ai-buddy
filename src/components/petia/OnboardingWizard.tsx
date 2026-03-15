@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, ChevronLeft, Camera } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import OnboardingStepName from "./onboarding/StepName";
+import OnboardingStepSpecies from "./onboarding/StepSpecies";
+import OnboardingStepAge from "./onboarding/StepAge";
+import OnboardingStepWeight from "./onboarding/StepWeight";
+import OnboardingStepPhoto from "./onboarding/StepPhoto";
+import OnboardingStepAuth from "./onboarding/StepAuth";
 
 export interface PetData {
   name: string;
@@ -9,30 +15,16 @@ export interface PetData {
   breed: string;
   ageRange: string;
   weightRange: string;
+  weightValue: number;
+  photoUrl: string | null;
+  photoFile: File | null;
 }
 
 interface OnboardingWizardProps {
   onComplete: (data: PetData) => void;
 }
 
-const SPECIES = [
-  { value: "dog", label: "Perro", emoji: "🐶" },
-  { value: "cat", label: "Gato", emoji: "🐱" },
-  { value: "small_pet", label: "Pequeño/Exótico", emoji: "🐰" },
-  { value: "bird", label: "Ave", emoji: "🐦" },
-];
-
-const AGE_RANGES = [
-  { value: "puppy", label: "Cachorro" },
-  { value: "adult", label: "Adulto" },
-  { value: "senior", label: "Senior" },
-];
-
-const WEIGHT_RANGES = [
-  { value: "small", label: "Pequeño" },
-  { value: "medium", label: "Mediano" },
-  { value: "large", label: "Grande" },
-];
+const TOTAL_STEPS = 6;
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 120 : -120, opacity: 0 }),
@@ -49,24 +41,26 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
     breed: "",
     ageRange: "adult",
     weightRange: "medium",
+    weightValue: 25,
+    photoUrl: null,
+    photoFile: null,
   });
 
-  const totalSteps = 3;
-  const progress = ((step + 1) / totalSteps) * 100;
+  const progress = ((step + 1) / TOTAL_STEPS) * 100;
 
-  const next = () => {
+  const next = useCallback(() => {
     setDirection(1);
-    setStep((s) => s + 1);
-  };
+    setStep((s) => Math.min(s + 1, TOTAL_STEPS - 1));
+  }, []);
 
-  const handleSpeciesSelect = (species: string) => {
-    setPetData((d) => ({ ...d, species }));
-    next();
-  };
+  const back = useCallback(() => {
+    setDirection(-1);
+    setStep((s) => Math.max(s - 1, 0));
+  }, []);
 
-  const handleFinish = () => {
-    onComplete(petData);
-  };
+  const update = useCallback((patch: Partial<PetData>) => {
+    setPetData((d) => ({ ...d, ...patch }));
+  }, []);
 
   return (
     <motion.div
@@ -75,193 +69,57 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] bg-background flex flex-col"
     >
-      {/* Progress bar */}
-      <div className="px-8 pt-14 pb-2">
-        <Progress value={progress} className="h-1.5 bg-muted" />
-        <p className="text-[10px] text-muted-foreground font-medium mt-2 tracking-widest uppercase text-right">
-          Paso {step + 1} de {totalSteps}
-        </p>
+      {/* Header: back + progress */}
+      <div className="px-6 pt-12 pb-2 flex items-center gap-3">
+        {step > 0 && step < TOTAL_STEPS - 1 && (
+          <motion.button
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={back}
+            className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
+          >
+            <ChevronLeft size={22} className="text-foreground" />
+          </motion.button>
+        )}
+        <div className="flex-1">
+          <Progress value={progress} className="h-1.5 bg-muted" />
+        </div>
+        <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase whitespace-nowrap">
+          {step + 1}/{TOTAL_STEPS}
+        </span>
       </div>
 
       {/* Steps */}
-      <div className="flex-1 flex items-center justify-center px-8 overflow-hidden">
+      <div className="flex-1 flex items-center justify-center px-6 overflow-hidden">
         <AnimatePresence mode="wait" custom={direction}>
           {step === 0 && (
-            <motion.div
-              key="step-name"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="w-full max-w-sm text-center"
-            >
-              <motion.h1
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-3xl font-black tracking-tight text-foreground mb-3"
-              >
-                ¡Hola! Bienvenido a Petia
-              </motion.h1>
-              <p className="text-muted-foreground font-medium mb-10">
-                ¿A quién vamos a cuidar hoy?
-              </p>
-
-              <input
-                type="text"
-                placeholder="Nombre de tu mascota (ej. Kulka)"
-                value={petData.name}
-                onChange={(e) => setPetData((d) => ({ ...d, name: e.target.value }))}
-                className="w-full text-center text-xl font-bold bg-transparent border-b-2 border-primary/30 focus:border-primary py-4 outline-none text-foreground placeholder:text-muted-foreground/50 transition-colors"
-                autoFocus
-              />
-
-              <AnimatePresence>
-                {petData.name.trim().length > 0 && (
-                  <motion.button
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 16 }}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={next}
-                    className="mt-10 w-full py-4 rounded-2xl gradient-cta text-primary-foreground font-bold text-base flex items-center justify-center gap-2 shadow-glow"
-                  >
-                    Siguiente <ArrowRight size={18} />
-                  </motion.button>
-                )}
-              </AnimatePresence>
+            <motion.div key="s0" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
+              <OnboardingStepName petData={petData} update={update} next={next} />
             </motion.div>
           )}
-
           {step === 1 && (
-            <motion.div
-              key="step-species"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="w-full max-w-sm text-center"
-            >
-              <h1 className="text-2xl font-black tracking-tight text-foreground mb-2">
-                ¿Qué tipo de animal es {petData.name}?
-              </h1>
-              <p className="text-muted-foreground font-medium mb-8">
-                Selecciona una opción
-              </p>
-
-              <div className="grid grid-cols-2 gap-4">
-                {SPECIES.map((sp, i) => (
-                  <motion.button
-                    key={sp.value}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08 }}
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => handleSpeciesSelect(sp.value)}
-                    className={`glass rounded-3xl p-6 flex flex-col items-center gap-3 shadow-soft transition-all ${
-                      petData.species === sp.value
-                        ? "ring-2 ring-primary shadow-glow"
-                        : ""
-                    }`}
-                  >
-                    <span className="text-4xl">{sp.emoji}</span>
-                    <span className="font-bold text-sm text-foreground">{sp.label}</span>
-                  </motion.button>
-                ))}
-              </div>
+            <motion.div key="s1" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
+              <OnboardingStepSpecies petData={petData} update={update} next={next} />
             </motion.div>
           )}
-
           {step === 2 && (
-            <motion.div
-              key="step-details"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="w-full max-w-sm text-center"
-            >
-              <h1 className="text-2xl font-black tracking-tight text-foreground mb-2">
-                ¡Casi listo!
-              </h1>
-              <p className="text-muted-foreground font-medium mb-8">
-                Cuéntanos más sobre {petData.name}
-              </p>
-
-              {/* Breed */}
-              <div className="mb-6">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block text-left">
-                  Raza (opcional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="ej. Golden Retriever"
-                  value={petData.breed}
-                  onChange={(e) => setPetData((d) => ({ ...d, breed: e.target.value }))}
-                  className="w-full glass rounded-2xl px-5 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 shadow-soft"
-                />
-              </div>
-
-              {/* Age Range */}
-              <div className="mb-6">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 block text-left">
-                  Edad
-                </label>
-                <div className="flex gap-2">
-                  {AGE_RANGES.map((a) => (
-                    <button
-                      key={a.value}
-                      onClick={() => setPetData((d) => ({ ...d, ageRange: a.value }))}
-                      className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all ${
-                        petData.ageRange === a.value
-                          ? "gradient-cta text-primary-foreground shadow-glow"
-                          : "glass text-foreground shadow-soft"
-                      }`}
-                    >
-                      {a.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Weight Range */}
-              <div className="mb-8">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 block text-left">
-                  Peso
-                </label>
-                <div className="flex gap-2">
-                  {WEIGHT_RANGES.map((w) => (
-                    <button
-                      key={w.value}
-                      onClick={() => setPetData((d) => ({ ...d, weightRange: w.value }))}
-                      className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all ${
-                        petData.weightRange === w.value
-                          ? "gradient-cta text-primary-foreground shadow-glow"
-                          : "glass text-foreground shadow-soft"
-                      }`}
-                    >
-                      {w.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={handleFinish}
-                className="w-full py-4 rounded-2xl gradient-cta text-primary-foreground font-bold text-base flex items-center justify-center gap-2 shadow-glow"
-              >
-                <Check size={18} /> Crear perfil de {petData.name}
-              </motion.button>
+            <motion.div key="s2" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
+              <OnboardingStepAge petData={petData} update={update} next={next} />
+            </motion.div>
+          )}
+          {step === 3 && (
+            <motion.div key="s3" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
+              <OnboardingStepWeight petData={petData} update={update} next={next} />
+            </motion.div>
+          )}
+          {step === 4 && (
+            <motion.div key="s4" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
+              <OnboardingStepPhoto petData={petData} update={update} next={next} />
+            </motion.div>
+          )}
+          {step === 5 && (
+            <motion.div key="s5" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
+              <OnboardingStepAuth petData={petData} onComplete={onComplete} />
             </motion.div>
           )}
         </AnimatePresence>

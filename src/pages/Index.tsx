@@ -14,7 +14,6 @@ import PetProfileSheet from "@/components/petia/PetProfileSheet";
 import PaywallScreen from "@/components/petia/PaywallScreen";
 import BottomNav from "@/components/petia/BottomNav";
 import OnboardingWizard, { type PetData } from "@/components/petia/OnboardingWizard";
-import AuthScreen from "@/components/petia/AuthScreen";
 import type { Pet } from "@/components/petia/FloatingBubble";
 
 const SPECIES_IMAGES: Record<string, string> = {
@@ -43,7 +42,6 @@ const Index = () => {
   const [authReady, setAuthReady] = useState(false);
   const [pets, setPets] = useState<Pet[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
   const [pendingPetData, setPendingPetData] = useState<PetData | null>(null);
 
   const [screen, setScreen] = useState("home");
@@ -118,12 +116,11 @@ const Index = () => {
     if (user && pendingPetData) {
       savePet(pendingPetData);
       setPendingPetData(null);
-      setShowAuth(false);
     }
   }, [user, pendingPetData]);
 
   const savePet = async (data: PetData) => {
-    const img = SPECIES_IMAGES[data.species] || SPECIES_IMAGES.dog;
+    const img = data.photoUrl || SPECIES_IMAGES[data.species] || SPECIES_IMAGES.dog;
     const { data: inserted, error } = await supabase
       .from("pets")
       .insert({
@@ -162,11 +159,7 @@ const Index = () => {
   const handleOnboardingComplete = (data: PetData) => {
     setPendingPetData(data);
     setShowOnboarding(false);
-    setShowAuth(true);
-  };
-
-  const handleAuthSuccess = () => {
-    // Auth state change listener will handle the rest
+    // Auth state change listener + pendingPetData effect will handle saving
   };
 
   const handleAnalyze = async (base64: string) => {
@@ -268,18 +261,8 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* Auth */}
-      <AnimatePresence>
-        {!showSplash && showAuth && pendingPetData && (
-          <AuthScreen
-            petName={pendingPetData.name}
-            onSuccess={handleAuthSuccess}
-          />
-        )}
-      </AnimatePresence>
-
       {/* Main screens (only when logged in and not onboarding) */}
-      {!showSplash && !showOnboarding && !showAuth && (
+      {!showSplash && !showOnboarding && (
         <>
           <AnimatePresence mode="wait">
             {screen === "home" && (
