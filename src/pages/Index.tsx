@@ -116,7 +116,6 @@ const Index = () => {
     if (user && pendingPetData) {
       savePet(pendingPetData);
       setPendingPetData(null);
-      setShowAuth(false);
     }
   }, [user, pendingPetData]);
 
