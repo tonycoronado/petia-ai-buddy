@@ -42,7 +42,6 @@ const Index = () => {
   const [authReady, setAuthReady] = useState(false);
   const [pets, setPets] = useState<Pet[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
   const [pendingPetData, setPendingPetData] = useState<PetData | null>(null);
 
   const [screen, setScreen] = useState("home");
