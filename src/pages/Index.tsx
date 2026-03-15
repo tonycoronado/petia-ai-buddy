@@ -261,18 +261,8 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* Auth */}
-      <AnimatePresence>
-        {!showSplash && showAuth && pendingPetData && (
-          <AuthScreen
-            petName={pendingPetData.name}
-            onSuccess={handleAuthSuccess}
-          />
-        )}
-      </AnimatePresence>
-
       {/* Main screens (only when logged in and not onboarding) */}
-      {!showSplash && !showOnboarding && !showAuth && (
+      {!showSplash && !showOnboarding && (
         <>
           <AnimatePresence mode="wait">
             {screen === "home" && (
