@@ -107,6 +107,20 @@ const Index = () => {
       setAnalysisResult(safeResult);
       setScreen("result");
       setIsAnalyzing(false);
+
+      // Save scan to database
+      supabase
+        .from("scan_history")
+        .insert({
+          pet_name: "Max",
+          scan_type: "Health Check",
+          status: safeResult.status,
+          title: safeResult.title,
+          description: safeResult.description,
+        })
+        .then(({ error: insertErr }) => {
+          if (insertErr) console.error("Failed to save scan:", insertErr);
+        });
     } catch (error) {
       console.error(error);
       setIsAnalyzing(false);
