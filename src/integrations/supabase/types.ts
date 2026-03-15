@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      pets: {
+        Row: {
+          age_range: string
+          breed: string | null
+          created_at: string
+          id: string
+          img: string | null
+          name: string
+          species: string
+          user_id: string
+          weight_range: string
+        }
+        Insert: {
+          age_range?: string
+          breed?: string | null
+          created_at?: string
+          id?: string
+          img?: string | null
+          name: string
+          species: string
+          user_id: string
+          weight_range?: string
+        }
+        Update: {
+          age_range?: string
+          breed?: string | null
+          created_at?: string
+          id?: string
+          img?: string | null
+          name?: string
+          species?: string
+          user_id?: string
+          weight_range?: string
+        }
+        Relationships: []
+      }
       scan_history: {
         Row: {
           created_at: string
