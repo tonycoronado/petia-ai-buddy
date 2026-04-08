@@ -135,7 +135,7 @@ const Index = () => {
 
     if (error) {
       console.error("Failed to save pet:", error);
-      toast.error("Error guardando mascota");
+      toast.error("Error saving pet profile");
       return;
     }
 
