@@ -19,8 +19,6 @@ import type { Pet } from "@/components/petia/FloatingBubble";
 const SPECIES_IMAGES: Record<string, string> = {
   dog: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=200",
   cat: "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&q=80&w=200",
-  small_pet: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&q=80&w=200",
-  bird: "https://images.unsplash.com/photo-1522926193341-e9ffd686c60f?auto=format&fit=crop&q=80&w=200",
 };
 
 const WEIGHT_LABELS: Record<string, string> = {
