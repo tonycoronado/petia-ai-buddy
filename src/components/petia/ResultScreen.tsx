@@ -9,6 +9,7 @@ export interface AnalysisResult {
 
 interface ResultScreenProps {
   result: AnalysisResult;
+  petName?: string;
   onSave: () => void;
   onChat: () => void;
   onDismiss: () => void;
@@ -41,7 +42,7 @@ const STATUS_CONFIG = {
   },
 };
 
-const ResultScreen = ({ result, onSave, onChat, onDismiss }: ResultScreenProps) => {
+const ResultScreen = ({ result, petName = "Pet", onSave, onChat, onDismiss }: ResultScreenProps) => {
   const config = STATUS_CONFIG[result.status] || STATUS_CONFIG.Yellow;
   const Icon = config.icon;
 
@@ -82,7 +83,7 @@ const ResultScreen = ({ result, onSave, onChat, onDismiss }: ResultScreenProps) 
             onClick={onSave}
             className="w-full py-5 bg-foreground text-background rounded-4xl font-bold flex items-center justify-center gap-2"
           >
-            Save to Max's Profile
+            Save to {petName}'s Profile
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.96 }}

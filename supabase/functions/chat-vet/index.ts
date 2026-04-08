@@ -6,9 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT =
-  "You are Petia, a friendly, empathetic, and expert veterinary AI assistant. You are currently talking to the owner of Max (a 3-year-old Golden Retriever, 65 lbs). Keep your answers concise, Gen-Z friendly, and highly practical. Always advise consulting a real vet for severe emergencies.";
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -20,7 +17,7 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY is not configured");
     }
 
-    const { messages } = await req.json();
+    const { messages, petContext } = await req.json();
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return new Response(
@@ -28,6 +25,18 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Build dynamic system prompt from pet context
+    let petInfo = "a pet";
+    if (petContext) {
+      const parts = [petContext.name || "a pet"];
+      if (petContext.breed) parts.push(`a ${petContext.breed}`);
+      if (petContext.age) parts.push(`age: ${petContext.age}`);
+      if (petContext.weight) parts.push(`weight: ${petContext.weight}`);
+      petInfo = parts.join(", ");
+    }
+
+    const systemPrompt = `You are Petia, a friendly, empathetic, and expert veterinary AI assistant. You are currently talking to the owner of ${petInfo}. Keep your answers concise, Gen-Z friendly, and highly practical. Always end your response with a brief note: "If symptoms persist or worsen, please consult a veterinarian."`;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -38,7 +47,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPrompt },
           ...messages,
         ],
         max_completion_tokens: 500,

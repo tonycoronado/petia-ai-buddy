@@ -7,9 +7,10 @@ interface PaywallScreenProps {
 }
 
 const FEATURES = [
-  "Unlimited AI Scans",
+  "Unlimited AI Food Scans",
   "Unlimited Pet Profiles",
-  "Detailed Health History",
+  "Visual Health Diary + AI Triage",
+  "Smart AI Reminders",
   "Priority Vet AI Chat",
 ];
 
@@ -86,7 +87,7 @@ const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
               Best Value
             </div>
             <span className="text-[10px] font-black uppercase text-primary">Yearly</span>
-            <div className="text-xl font-black mt-1 text-foreground">$49.99</div>
+            <div className="text-xl font-black mt-1 text-foreground">$47.99</div>
           </motion.button>
         </div>
 

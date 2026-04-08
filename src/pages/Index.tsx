@@ -19,8 +19,6 @@ import type { Pet } from "@/components/petia/FloatingBubble";
 const SPECIES_IMAGES: Record<string, string> = {
   dog: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=200",
   cat: "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&q=80&w=200",
-  small_pet: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&q=80&w=200",
-  bird: "https://images.unsplash.com/photo-1522926193341-e9ffd686c60f?auto=format&fit=crop&q=80&w=200",
 };
 
 const WEIGHT_LABELS: Record<string, string> = {
@@ -137,7 +135,7 @@ const Index = () => {
 
     if (error) {
       console.error("Failed to save pet:", error);
-      toast.error("Error guardando mascota");
+      toast.error("Error saving pet profile");
       return;
     }
 
@@ -153,7 +151,7 @@ const Index = () => {
       },
     ]);
     setShowOnboarding(false);
-    toast.success(`¡Perfil de ${data.name} creado!`);
+    toast.success(`${data.name}'s profile created!`);
   };
 
   const handleOnboardingComplete = (data: PetData) => {
@@ -283,6 +281,7 @@ const Index = () => {
             {screen === "result" && analysisResult && (
               <ResultScreen
                 result={analysisResult}
+                petName={pets[0]?.name}
                 onSave={() => {
                   toast.success(`Saved to ${pets[0]?.name ?? "pet"}'s profile!`);
                   setScreen("home");
@@ -292,7 +291,16 @@ const Index = () => {
               />
             )}
             {screen === "history" && <HistoryScreen />}
-            {screen === "chat" && <ChatScreen />}
+            {screen === "chat" && (
+              <ChatScreen
+                petContext={pets[0] ? {
+                  name: pets[0].name,
+                  breed: pets[0].breed,
+                  age: pets[0].age,
+                  weight: pets[0].weight,
+                } : undefined}
+              />
+            )}
             {screen === "profile" && (
               <ProfileScreen onOpenPaywall={() => setShowPaywall(true)} />
             )}

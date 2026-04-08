@@ -39,7 +39,7 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="text-center text-muted-foreground text-sm font-medium mt-2 tracking-widest uppercase"
         >
-          AI Pet Care
+          Your Pet's Personal Care Companion
         </motion.p>
       </motion.div>
     </motion.div>
