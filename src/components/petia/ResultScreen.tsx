@@ -83,7 +83,7 @@ const ResultScreen = ({ result, petName = "Pet", onSave, onChat, onDismiss }: Re
             onClick={onSave}
             className="w-full py-5 bg-foreground text-background rounded-4xl font-bold flex items-center justify-center gap-2"
           >
-            Save to Max's Profile
+            Save to {petName}'s Profile
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.96 }}

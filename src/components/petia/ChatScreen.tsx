@@ -9,12 +9,27 @@ interface Message {
   content: string;
 }
 
-const ChatScreen = () => {
+interface PetContext {
+  name: string;
+  species?: string;
+  breed?: string;
+  age?: string;
+  weight?: string;
+}
+
+interface ChatScreenProps {
+  petContext?: PetContext;
+}
+
+const DISCLAIMER = "\n\n⚠️ This is not a diagnosis. If you are concerned about your pet's health, please consult a veterinarian.";
+
+const ChatScreen = ({ petContext }: ChatScreenProps) => {
+  const petName = petContext?.name || "your pet";
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "Hi there! 👋 I'm Petia, your Vet AI assistant. How can I help Max today?",
+      content: `Hi there! 👋 I'm Petia, your Vet AI assistant. How can I help ${petName} today?`,
     },
   ]);
   const [input, setInput] = useState("");
@@ -51,6 +66,7 @@ const ChatScreen = () => {
             role: m.role,
             content: m.content,
           })),
+          petContext,
         },
       });
 
@@ -85,7 +101,7 @@ const ChatScreen = () => {
 
       const aiContent =
         typeof data?.content === "string" && data.content.trim().length > 0
-          ? data.content
+          ? data.content + DISCLAIMER
           : "Sorry, I couldn't process that. Could you try again?";
 
       setMessages((prev) => [...prev, { role: "assistant", content: aiContent }]);
@@ -142,7 +158,7 @@ const ChatScreen = () => {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] px-5 py-3.5 text-sm leading-relaxed ${
+              className={`max-w-[80%] px-5 py-3.5 text-sm leading-relaxed whitespace-pre-line ${
                 msg.role === "user"
                   ? "gradient-cta text-primary-foreground rounded-3xl rounded-br-lg"
                   : "glass rounded-3xl rounded-bl-lg text-foreground shadow-soft"
