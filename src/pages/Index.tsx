@@ -281,6 +281,7 @@ const Index = () => {
             {screen === "result" && analysisResult && (
               <ResultScreen
                 result={analysisResult}
+                petName={pets[0]?.name}
                 onSave={() => {
                   toast.success(`Saved to ${pets[0]?.name ?? "pet"}'s profile!`);
                   setScreen("home");
@@ -290,7 +291,16 @@ const Index = () => {
               />
             )}
             {screen === "history" && <HistoryScreen />}
-            {screen === "chat" && <ChatScreen />}
+            {screen === "chat" && (
+              <ChatScreen
+                petContext={pets[0] ? {
+                  name: pets[0].name,
+                  breed: pets[0].breed,
+                  age: pets[0].age,
+                  weight: pets[0].weight,
+                } : undefined}
+              />
+            )}
             {screen === "profile" && (
               <ProfileScreen onOpenPaywall={() => setShowPaywall(true)} />
             )}
