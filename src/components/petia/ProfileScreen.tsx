@@ -9,7 +9,7 @@ const MENU_ITEMS = [
   { icon: User, label: "Account Details" },
   { icon: PawPrint, label: "Manage Pets" },
   { icon: Settings, label: "App Settings" },
-  { icon: CreditCard, label: "Subscription", subtitle: "Free Plan — Upgrade to PRO", opensPaywall: true },
+  { icon: CreditCard, label: "Subscription", subtitle: "Free Plan", opensPaywall: true },
 ];
 
 const ProfileScreen = ({ onOpenPaywall }: ProfileScreenProps) => (

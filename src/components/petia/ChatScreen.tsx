@@ -9,27 +9,12 @@ interface Message {
   content: string;
 }
 
-interface PetContext {
-  name: string;
-  species?: string;
-  breed?: string;
-  age?: string;
-  weight?: string;
-}
-
-interface ChatScreenProps {
-  petContext?: PetContext;
-}
-
-const DISCLAIMER = "\n\n⚠️ This is not a diagnosis. If you are concerned about your pet's health, please consult a veterinarian.";
-
-const ChatScreen = ({ petContext }: ChatScreenProps) => {
-  const petName = petContext?.name || "your pet";
-
+const ChatScreen = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: `Hi there! 👋 I'm Petia, your Vet AI assistant. How can I help ${petName} today?`,
+      content:
+        "Hi there! 👋 I'm Petia, your Vet AI assistant. How can I help Max today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -66,7 +51,6 @@ const ChatScreen = ({ petContext }: ChatScreenProps) => {
             role: m.role,
             content: m.content,
           })),
-          petContext,
         },
       });
 
@@ -101,7 +85,7 @@ const ChatScreen = ({ petContext }: ChatScreenProps) => {
 
       const aiContent =
         typeof data?.content === "string" && data.content.trim().length > 0
-          ? data.content + DISCLAIMER
+          ? data.content
           : "Sorry, I couldn't process that. Could you try again?";
 
       setMessages((prev) => [...prev, { role: "assistant", content: aiContent }]);
@@ -158,7 +142,7 @@ const ChatScreen = ({ petContext }: ChatScreenProps) => {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] px-5 py-3.5 text-sm leading-relaxed whitespace-pre-line ${
+              className={`max-w-[80%] px-5 py-3.5 text-sm leading-relaxed ${
                 msg.role === "user"
                   ? "gradient-cta text-primary-foreground rounded-3xl rounded-br-lg"
                   : "glass rounded-3xl rounded-bl-lg text-foreground shadow-soft"

@@ -44,7 +44,7 @@ const HomeScreen = ({ pets, onSelectPet, onScan, onAnalyze, isAnalyzing }: HomeS
     >
       <header className="mb-12">
         <h1 className="text-4xl font-black tracking-tight mb-2 text-foreground">Petia</h1>
-        <p className="text-muted-foreground font-medium">Your Pet's Personal Care Companion</p>
+        <p className="text-muted-foreground font-medium">Your AI pet companion.</p>
       </header>
 
       <div className="flex justify-around mb-20 relative">
@@ -80,13 +80,13 @@ const HomeScreen = ({ pets, onSelectPet, onScan, onAnalyze, isAnalyzing }: HomeS
             ) : (
               <>
                 <Camera size={48} strokeWidth={1.5} className="mb-2" />
-                <span className="font-bold uppercase tracking-[0.2em] text-xs">AI Scanner</span>
+                <span className="font-bold uppercase tracking-[0.2em] text-xs">Scan Pet</span>
               </>
             )}
           </div>
         </motion.button>
         <p className="mt-8 text-center text-muted-foreground text-sm font-medium max-w-[200px]">
-          {isAnalyzing ? "AI is analyzing the image..." : "Scan food labels, health concerns, or symptoms"}
+          {isAnalyzing ? "AI is analyzing the image..." : "Point camera at symptoms or food items"}
         </p>
       </div>
     </motion.div>
