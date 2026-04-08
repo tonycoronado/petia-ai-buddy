@@ -44,7 +44,7 @@ const HomeScreen = ({ pets, onSelectPet, onScan, onAnalyze, isAnalyzing }: HomeS
     >
       <header className="mb-12">
         <h1 className="text-4xl font-black tracking-tight mb-2 text-foreground">Petia</h1>
-        <p className="text-muted-foreground font-medium">Your AI pet companion.</p>
+        <p className="text-muted-foreground font-medium">Your Pet's Personal Care Companion</p>
       </header>
 
       <div className="flex justify-around mb-20 relative">
