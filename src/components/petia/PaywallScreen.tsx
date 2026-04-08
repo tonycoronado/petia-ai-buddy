@@ -7,9 +7,10 @@ interface PaywallScreenProps {
 }
 
 const FEATURES = [
-  "Unlimited AI Scans",
+  "Unlimited AI Food Scans",
   "Unlimited Pet Profiles",
-  "Detailed Health History",
+  "Visual Health Diary + AI Triage",
+  "Smart AI Reminders",
   "Priority Vet AI Chat",
 ];
 
