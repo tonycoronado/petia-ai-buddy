@@ -42,7 +42,7 @@ const STATUS_CONFIG = {
   },
 };
 
-const ResultScreen = ({ result, onSave, onChat, onDismiss }: ResultScreenProps) => {
+const ResultScreen = ({ result, petName = "Pet", onSave, onChat, onDismiss }: ResultScreenProps) => {
   const config = STATUS_CONFIG[result.status] || STATUS_CONFIG.Yellow;
   const Icon = config.icon;
 
