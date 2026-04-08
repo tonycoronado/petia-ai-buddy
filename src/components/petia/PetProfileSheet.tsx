@@ -1,16 +1,13 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Activity, Droplets, Utensils, ShieldCheck } from "lucide-react";
+import { Activity, Droplets, PawPrint, ShieldCheck, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import type { Pet } from "./FloatingBubble";
 
 interface PetProfileSheetProps {
   pet: Pet;
   onClose: () => void;
 }
-
-const HISTORY = [
-  { id: 1, date: "Oct 24", type: "Health Scan", result: "Normal" },
-  { id: 2, date: "Oct 20", type: "Toxicity Check", result: "Safe" },
-];
 
 const PetProfileSheet = ({ pet, onClose }: PetProfileSheetProps) => (
   <>
