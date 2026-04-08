@@ -1,16 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { X, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface PaywallScreenProps {
   onClose: () => void;
 }
 
 const FEATURES = [
-  "Unlimited AI Scans",
+  "Unlimited AI Food Scans",
+  "Visual Health Diary + AI Triage",
+  "Mood Patterns & Insights",
+  "Smart AI Reminders",
+  "Expense Tracker",
   "Unlimited Pet Profiles",
-  "Detailed Health History",
-  "Priority Vet AI Chat",
+  "Priority AI Care Chat",
+  "Vet Visit PDF Export",
 ];
 
 const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
@@ -49,13 +54,17 @@ const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
           </h2>
         </div>
 
-        <div className="space-y-4 mb-12">
+        <p className="text-muted-foreground font-medium text-sm mb-8 leading-relaxed">
+          Give your pet the premium care they deserve. Less than a bag of treats per month.
+        </p>
+
+        <div className="space-y-3 mb-10">
           {FEATURES.map((feature) => (
             <div key={feature} className="flex items-center gap-3">
               <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                 <CheckCircle2 size={14} strokeWidth={3} />
               </div>
-              <span className="font-bold text-muted-foreground">{feature}</span>
+              <span className="font-bold text-muted-foreground text-sm">{feature}</span>
             </div>
           ))}
         </div>
@@ -72,6 +81,7 @@ const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
           >
             <span className="text-[10px] font-black uppercase text-muted-foreground">Monthly</span>
             <div className="text-xl font-black mt-1 text-foreground">$5.99</div>
+            <span className="text-[10px] text-muted-foreground font-medium">per month</span>
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.96 }}
@@ -83,15 +93,20 @@ const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
             }`}
           >
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest whitespace-nowrap">
-              Best Value
+              Save 33%
             </div>
             <span className="text-[10px] font-black uppercase text-primary">Yearly</span>
-            <div className="text-xl font-black mt-1 text-foreground">$49.99</div>
+            <div className="text-xl font-black mt-1 text-foreground">$47.99</div>
+            <span className="text-[10px] text-muted-foreground font-medium">$3.99/month</span>
           </motion.button>
         </div>
 
         <motion.button
           whileTap={{ scale: 0.96 }}
+          onClick={() => {
+            toast.success("🎉 Welcome to Petia PRO! Enjoy your 7-day free trial.");
+            onClose();
+          }}
           className="w-full py-6 gradient-cta text-primary-foreground rounded-4xl font-black text-lg shadow-glow"
         >
           Start 7-Day Free Trial

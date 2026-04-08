@@ -1,20 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Send, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { Send } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
+const MOCK_RESPONSES: string[] = [
+  "That's a great question! Based on Luna's profile as a 3-year-old Golden Retriever, I'd recommend monitoring this closely for 24-48 hours. If you notice any changes, it's best to visit your vet.\n\n⚕️ This is not a diagnosis. If you are concerned about Luna's health, please consult a veterinarian.",
+  "Golden Retrievers are prone to hip dysplasia and skin allergies. Since Luna is still young, maintaining a healthy weight and regular exercise is key. I'd suggest 30-60 minutes of moderate activity daily.\n\n⚕️ This is not a diagnosis. If you are concerned about Luna's health, please consult a veterinarian.",
+  "For Luna's coat health, Omega-3 fatty acids are wonderful! You can add fish oil supplements to her food — about 1000mg per day for her weight. It helps with skin, coat, and joint health.\n\n⚕️ This is not a diagnosis. If you are concerned about Luna's health, please consult a veterinarian.",
+  "That's actually quite normal for Golden Retrievers! They tend to shed more during spring and fall. Regular brushing (2-3 times a week) and a good diet will help manage it.\n\n⚕️ This is not a diagnosis. If you are concerned about Luna's health, please consult a veterinarian.",
+];
+
 const ChatScreen = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
       content:
-        "Hi there! 👋 I'm Petia, your Vet AI assistant. How can I help Max today?",
+        "Hi there! 👋 I'm your Petia care assistant. I know all about Luna — her breed, age, weight, and health history. How can I help today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -34,71 +39,21 @@ const ChatScreen = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = async () => {
+  const handleSend = () => {
     const trimmed = input.trim();
     if (!trimmed || isTyping) return;
 
     const userMsg: Message = { role: "user", content: trimmed };
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
 
-    try {
-      const { data, error } = await supabase.functions.invoke("chat-vet", {
-        body: {
-          messages: updatedMessages.map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
-        },
-      });
-
-      if (error) {
-        let backendMessage: string | null = null;
-        const context = (error as any)?.context;
-        if (context && typeof context.json === "function") {
-          try {
-            const payload = await context.json();
-            if (typeof payload?.message === "string" && payload.message.trim().length > 0) {
-              backendMessage = payload.message;
-            }
-          } catch {
-            // ignore
-          }
-        }
-        throw new Error(
-          backendMessage ||
-            (error instanceof Error && error.message.trim().length > 0
-              ? error.message
-              : "Network error, please try again")
-        );
-      }
-
-      if (data?.error === true) {
-        throw new Error(
-          typeof data?.message === "string" && data.message.trim().length > 0
-            ? data.message
-            : "AI error"
-        );
-      }
-
-      const aiContent =
-        typeof data?.content === "string" && data.content.trim().length > 0
-          ? data.content
-          : "Sorry, I couldn't process that. Could you try again?";
-
-      setMessages((prev) => [...prev, { role: "assistant", content: aiContent }]);
-    } catch (e) {
-      console.error(e);
-      toast.error(
-        e instanceof Error && e.message.trim().length > 0
-          ? e.message
-          : "Network error, please try again"
-      );
-    } finally {
+    // Simulate AI response
+    setTimeout(() => {
+      const response = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
+      setMessages((prev) => [...prev, { role: "assistant", content: response }]);
       setIsTyping(false);
-    }
+    }, 1500 + Math.random() * 1000);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -119,13 +74,16 @@ const ChatScreen = () => {
       <div className="pt-16 px-6 pb-4">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-black tracking-tight text-foreground">
-            Vet AI Assistant
+            AI Care Assistant
           </h1>
           <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Online
           </span>
         </div>
+        <p className="text-xs text-muted-foreground font-medium mt-0.5">
+          Personalized advice for Luna
+        </p>
       </div>
 
       {/* Messages */}
@@ -142,7 +100,7 @@ const ChatScreen = () => {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] px-5 py-3.5 text-sm leading-relaxed ${
+              className={`max-w-[80%] px-5 py-3.5 text-sm leading-relaxed whitespace-pre-line ${
                 msg.role === "user"
                   ? "gradient-cta text-primary-foreground rounded-3xl rounded-br-lg"
                   : "glass rounded-3xl rounded-bl-lg text-foreground shadow-soft"
@@ -160,9 +118,10 @@ const ChatScreen = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex justify-start"
           >
-            <div className="glass rounded-3xl rounded-bl-lg px-5 py-3.5 shadow-soft flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 size={16} className="animate-spin" />
-              Typing...
+            <div className="glass rounded-3xl rounded-bl-lg px-5 py-3.5 shadow-soft flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-muted-foreground animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: "0.2s" }} />
+              <span className="w-2 h-2 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: "0.4s" }} />
             </div>
           </motion.div>
         )}
@@ -173,7 +132,7 @@ const ChatScreen = () => {
         <div className="glass rounded-3xl flex items-center gap-3 px-5 py-3 shadow-soft">
           <input
             type="text"
-            placeholder="Type a message..."
+            placeholder="Ask about Luna's health..."
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
             value={input}
             onChange={(e) => setInput(e.target.value)}

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Activity, Droplets, Utensils, ShieldCheck } from "lucide-react";
+import { Activity, Droplets, PawPrint, ShieldCheck, TrendingUp, Heart } from "lucide-react";
 import type { Pet } from "./FloatingBubble";
 
 interface PetProfileSheetProps {
@@ -7,9 +7,11 @@ interface PetProfileSheetProps {
   onClose: () => void;
 }
 
-const HISTORY = [
-  { id: 1, date: "Oct 24", type: "Health Scan", result: "Normal" },
-  { id: 2, date: "Oct 20", type: "Toxicity Check", result: "Safe" },
+const MOCK_TIMELINE = [
+  { id: 1, date: "Apr 6", type: "Mood Check", result: "Happy", icon: Heart },
+  { id: 2, date: "Apr 5", type: "Food Scan", result: "Good Match", icon: ShieldCheck },
+  { id: 3, date: "Apr 2", type: "Health Check", result: "Monitoring", icon: Activity },
+  { id: 4, date: "Mar 28", type: "Weight Log", result: "On Track", icon: TrendingUp },
 ];
 
 const PetProfileSheet = ({ pet, onClose }: PetProfileSheetProps) => (
@@ -46,7 +48,7 @@ const PetProfileSheet = ({ pet, onClose }: PetProfileSheetProps) => (
         {[
           { label: "Age", val: pet.age, icon: Activity },
           { label: "Weight", val: pet.weight, icon: Droplets },
-          { label: "Daily", val: "800kcal", icon: Utensils },
+          { label: "Breed", val: pet.breed.split(" ")[0], icon: PawPrint },
         ].map((stat) => (
           <div key={stat.label} className="bg-muted p-4 rounded-4xl text-center">
             <stat.icon size={16} className="mx-auto mb-2 text-muted-foreground" />
@@ -59,17 +61,17 @@ const PetProfileSheet = ({ pet, onClose }: PetProfileSheetProps) => (
       </div>
 
       <h4 className="font-black uppercase tracking-widest text-xs text-muted-foreground mb-4 px-2">
-        Recent History
+        Recent Activity
       </h4>
       <div className="space-y-2">
-        {HISTORY.map((item) => (
+        {MOCK_TIMELINE.map((item) => (
           <div
             key={item.id}
             className="flex items-center justify-between p-5 bg-muted rounded-4xl"
           >
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-2xl bg-card flex items-center justify-center text-primary shadow-sm">
-                <ShieldCheck size={20} />
+                <item.icon size={20} />
               </div>
               <div>
                 <div className="font-bold text-sm text-foreground">{item.type}</div>
