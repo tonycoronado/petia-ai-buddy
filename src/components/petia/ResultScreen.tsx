@@ -9,6 +9,7 @@ export interface AnalysisResult {
 
 interface ResultScreenProps {
   result: AnalysisResult;
+  petName?: string;
   onSave: () => void;
   onChat: () => void;
   onDismiss: () => void;
