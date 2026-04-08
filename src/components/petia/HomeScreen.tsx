@@ -80,7 +80,7 @@ const HomeScreen = ({ pets, onSelectPet, onScan, onAnalyze, isAnalyzing }: HomeS
             ) : (
               <>
                 <Camera size={48} strokeWidth={1.5} className="mb-2" />
-                <span className="font-bold uppercase tracking-[0.2em] text-xs">Scan Pet</span>
+                <span className="font-bold uppercase tracking-[0.2em] text-xs">AI Scanner</span>
               </>
             )}
           </div>
