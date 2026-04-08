@@ -8,9 +8,9 @@ interface Props {
 }
 
 const MESSAGES = [
-  (name: string) => `Analyzing ${name}'s data...`,
-  (_: string) => "Adjusting nutritional needs based on breed...",
-  (_: string) => "Almost ready! Finalizing the personalized profile...",
+  (name: string) => `Analyzing ${name}'s profile data...`,
+  (_: string) => "Checking breed-specific care needs...",
+  (_: string) => "Almost ready! Finalizing personalized profile...",
 ];
 
 const DURATION = 3500; // ms total

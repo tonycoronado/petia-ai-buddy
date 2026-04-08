@@ -4,8 +4,6 @@ import type { PetData } from "../OnboardingWizard";
 const SPECIES = [
   { value: "dog", label: "Dog", emoji: "🐶" },
   { value: "cat", label: "Cat", emoji: "🐱" },
-  { value: "small_pet", label: "Exotic / Small", emoji: "🐰" },
-  { value: "bird", label: "Bird", emoji: "🐦" },
 ];
 
 interface Props {

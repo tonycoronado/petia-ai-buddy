@@ -151,7 +151,7 @@ const Index = () => {
       },
     ]);
     setShowOnboarding(false);
-    toast.success(`¡Perfil de ${data.name} creado!`);
+    toast.success(`${data.name}'s profile created!`);
   };
 
   const handleOnboardingComplete = (data: PetData) => {

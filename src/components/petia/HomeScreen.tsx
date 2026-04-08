@@ -86,7 +86,7 @@ const HomeScreen = ({ pets, onSelectPet, onScan, onAnalyze, isAnalyzing }: HomeS
           </div>
         </motion.button>
         <p className="mt-8 text-center text-muted-foreground text-sm font-medium max-w-[200px]">
-          {isAnalyzing ? "AI is analyzing the image..." : "Point camera at symptoms or food items"}
+          {isAnalyzing ? "AI is analyzing the image..." : "Scan food labels, health concerns, or symptoms"}
         </p>
       </div>
     </motion.div>
