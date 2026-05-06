@@ -22,7 +22,10 @@ import SplashScreen from "@/components/petia/SplashScreen";
 import type { Pet } from "@/components/petia/FloatingBubble";
 import { MOCK_PETS } from "@/lib/mockData";
 import { AppSettingsProvider } from "@/lib/appSettings";
+import { useScreenStack } from "@/lib/useScreenStack";
 import { toast } from "sonner";
+
+type SubScreenId = "mood" | "weight" | "reminders" | "vet" | "expenses" | "insights" | "pdf" | "referral" | "terms" | "privacy";
 
 const TERMS = [
   "Welcome to Petia. By using this app, you agree to these Terms of Service.",
@@ -43,7 +46,7 @@ const Inner = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [splashExit, setSplashExit] = useState(false);
   const [tab, setTab] = useState("home");
-  const [subScreen, setSubScreen] = useState<string | null>(null);
+  const { current: subScreen, push, pop, reset } = useScreenStack<SubScreenId>();
   const [activePet, setActivePet] = useState<Pet>(MOCK_PETS[0]);
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
