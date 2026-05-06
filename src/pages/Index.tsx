@@ -22,7 +22,10 @@ import SplashScreen from "@/components/petia/SplashScreen";
 import type { Pet } from "@/components/petia/FloatingBubble";
 import { MOCK_PETS } from "@/lib/mockData";
 import { AppSettingsProvider } from "@/lib/appSettings";
+import { useScreenStack } from "@/lib/useScreenStack";
 import { toast } from "sonner";
+
+type SubScreenId = "mood" | "weight" | "reminders" | "vet" | "expenses" | "insights" | "pdf" | "referral" | "terms" | "privacy";
 
 const TERMS = [
   "Welcome to Petia. By using this app, you agree to these Terms of Service.",
@@ -43,7 +46,7 @@ const Inner = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [splashExit, setSplashExit] = useState(false);
   const [tab, setTab] = useState("home");
-  const [subScreen, setSubScreen] = useState<string | null>(null);
+  const { current: subScreen, push, pop, reset } = useScreenStack<SubScreenId>();
   const [activePet, setActivePet] = useState<Pet>(MOCK_PETS[0]);
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -82,9 +85,9 @@ const Inner = () => {
                 onSelectPet={handleSelectPet}
                 onOpenScanner={() => setTab("scanner")}
                 onOpenAccount={() => setShowAccount(true)}
-                onOpenMoodHistory={() => setSubScreen("mood")}
-                onOpenReminders={() => setSubScreen("reminders")}
-                onOpenInsights={() => setSubScreen("insights")}
+                onOpenMoodHistory={() => push("mood" as SubScreenId)}
+                onOpenReminders={() => push("reminders" as SubScreenId)}
+                onOpenInsights={() => push("insights" as SubScreenId)}
               />
             )}
             {!subScreen && tab === "scanner" && (
@@ -98,25 +101,25 @@ const Inner = () => {
                 activePet={activePet}
                 onSelectPet={(p) => { setActivePet(p); toast.success(`${p.name} is now active`); }}
                 onAddPet={openPaywall}
-                onOpenReminders={() => setSubScreen("reminders")}
-                onOpenWeight={() => setSubScreen("weight")}
-                onOpenVet={() => setSubScreen("vet")}
-                onOpenExpenses={() => setSubScreen("expenses")}
-                onOpenInsights={() => setSubScreen("insights")}
-                onOpenPDF={() => setSubScreen("pdf")}
+                onOpenReminders={() => push("reminders" as SubScreenId)}
+                onOpenWeight={() => push("weight" as SubScreenId)}
+                onOpenVet={() => push("vet" as SubScreenId)}
+                onOpenExpenses={() => push("expenses" as SubScreenId)}
+                onOpenInsights={() => push("insights" as SubScreenId)}
+                onOpenPDF={() => push("pdf" as SubScreenId)}
               />
             )}
 
-            {subScreen === "mood" && <MoodHistoryScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => setSubScreen(null)} />}
-            {subScreen === "weight" && <WeightTrackerScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => setSubScreen(null)} onUpgrade={openPaywall} />}
-            {subScreen === "reminders" && <RemindersScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => setSubScreen(null)} onUpgrade={openPaywall} />}
-            {subScreen === "vet" && <VetVisitsScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => setSubScreen(null)} />}
-            {subScreen === "expenses" && <ExpenseTrackerScreen onBack={() => setSubScreen(null)} />}
-            {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => setSubScreen(null)} onUpgrade={openPaywall} />}
-            {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => setSubScreen(null)} onUpgrade={openPaywall} />}
-            {subScreen === "referral" && <ReferralScreen onBack={() => setSubScreen(null)} />}
-            {subScreen === "terms" && <LegalScreen title="Terms of Service" body={TERMS} onBack={() => setSubScreen(null)} />}
-            {subScreen === "privacy" && <LegalScreen title="Privacy Policy" body={PRIVACY} onBack={() => setSubScreen(null)} />}
+            {subScreen === "mood" && <MoodHistoryScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
+            {subScreen === "weight" && <WeightTrackerScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
+            {subScreen === "reminders" && <RemindersScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
+            {subScreen === "vet" && <VetVisitsScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
+            {subScreen === "expenses" && <ExpenseTrackerScreen onBack={() => pop()} />}
+            {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => pop()} onUpgrade={openPaywall} />}
+            {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
+            {subScreen === "referral" && <ReferralScreen onBack={() => pop()} />}
+            {subScreen === "terms" && <LegalScreen title="Terms of Service" body={TERMS} onBack={() => pop()} />}
+            {subScreen === "privacy" && <LegalScreen title="Privacy Policy" body={PRIVACY} onBack={() => pop()} />}
           </AnimatePresence>
 
           <AnimatePresence>
@@ -130,14 +133,14 @@ const Inner = () => {
               <AccountSheet
                 onClose={() => setShowAccount(false)}
                 onOpenPaywall={() => { setShowAccount(false); openPaywall(); }}
-                onOpenReferral={() => { setShowAccount(false); setSubScreen("referral"); }}
-                onOpenTerms={() => { setShowAccount(false); setSubScreen("terms"); }}
-                onOpenPrivacy={() => { setShowAccount(false); setSubScreen("privacy"); }}
+                onOpenReferral={() => { setShowAccount(false); push("referral" as SubScreenId); }}
+                onOpenTerms={() => { setShowAccount(false); push("terms" as SubScreenId); }}
+                onOpenPrivacy={() => { setShowAccount(false); push("privacy" as SubScreenId); }}
               />
             )}
           </AnimatePresence>
 
-          {!subScreen && <BottomNav activeTab={tab} setTab={(t) => { setSubScreen(null); setTab(t); }} />}
+          {!subScreen && <BottomNav activeTab={tab} setTab={(t) => { reset(); setTab(t); }} />}
         </>
       )}
     </div>
