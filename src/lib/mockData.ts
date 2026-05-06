@@ -218,3 +218,50 @@ export const MOCK_SCAN_HISTORY: ScanHistoryEntry[] = [
   { id: "s3", date: "Mar 30", title: "Chicken Treats", brand: "Treaty Co.", score: "Not Recommended", thumb: "https://images.unsplash.com/photo-1601758174039-86d44e0c6a16?auto=format&fit=crop&q=80&w=200" },
   { id: "s4", date: "Mar 22", title: "Salmon Fillet (cooked)", brand: "Home meal", score: "Good", thumb: "https://images.unsplash.com/photo-1574781330855-d0db8cc6a79c?auto=format&fit=crop&q=80&w=200" },
 ];
+
+export interface YearlyMonth {
+  month: string;
+  amount: number;
+}
+
+export const MOCK_YEARLY_EXPENSES: YearlyMonth[] = [
+  { month: "Jan", amount: 240.5 },
+  { month: "Feb", amount: 198.0 },
+  { month: "Mar", amount: 312.75 },
+  { month: "Apr", amount: 306.48 },
+  { month: "May", amount: 0 },
+  { month: "Jun", amount: 0 },
+  { month: "Jul", amount: 0 },
+  { month: "Aug", amount: 0 },
+  { month: "Sep", amount: 0 },
+  { month: "Oct", amount: 0 },
+  { month: "Nov", amount: 0 },
+  { month: "Dec", amount: 0 },
+];
+
+export const MOCK_YEARLY_TOP_CATEGORIES = [
+  { category: "Vet", amount: 420.0, percent: 40 },
+  { category: "Food", amount: 298.5, percent: 28 },
+  { category: "Insurance", amount: 140.0, percent: 13 },
+  { category: "Grooming", amount: 135.0, percent: 13 },
+  { category: "Toys", amount: 64.23, percent: 6 },
+];
+
+export interface AIExpenseEstimate {
+  predicted: number;
+  confidence: "High" | "Medium" | "Low";
+  basis: string;
+  breakdown: { label: string; value: string }[];
+}
+
+export const MOCK_AI_EXPENSE_ESTIMATE: AIExpenseEstimate = {
+  predicted: 295,
+  confidence: "High",
+  basis: "Based on 4 months of history",
+  breakdown: [
+    { label: "3-month average", value: "$272.41" },
+    { label: "Recurring (insurance + food)", value: "$97.99" },
+    { label: "Seasonal trend (spring grooming)", value: "+$18.00" },
+    { label: "Vet visits (none expected)", value: "$0.00" },
+  ],
+};
