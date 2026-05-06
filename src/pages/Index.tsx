@@ -1,99 +1,143 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import HomeScreen from "@/components/petia/HomeScreen";
 import FoodScannerScreen from "@/components/petia/FoodScannerScreen";
 import HealthDiaryScreen from "@/components/petia/HealthDiaryScreen";
 import ChatScreen from "@/components/petia/ChatScreen";
-import ProfileScreen from "@/components/petia/ProfileScreen";
+import PetHubScreen from "@/components/petia/pet/PetHubScreen";
 import PetProfileSheet from "@/components/petia/PetProfileSheet";
 import PaywallScreen from "@/components/petia/PaywallScreen";
 import ExpenseTrackerScreen from "@/components/petia/ExpenseTrackerScreen";
+import MoodHistoryScreen from "@/components/petia/MoodHistoryScreen";
+import WeightTrackerScreen from "@/components/petia/WeightTrackerScreen";
+import RemindersScreen from "@/components/petia/RemindersScreen";
+import VetVisitsScreen from "@/components/petia/VetVisitsScreen";
+import WeeklyInsightsScreen from "@/components/petia/WeeklyInsightsScreen";
+import PDFExportScreen from "@/components/petia/PDFExportScreen";
+import AccountSheet from "@/components/petia/account/AccountSheet";
+import ReferralScreen from "@/components/petia/account/ReferralScreen";
+import LegalScreen from "@/components/petia/account/LegalScreen";
 import BottomNav from "@/components/petia/BottomNav";
 import SplashScreen from "@/components/petia/SplashScreen";
 import type { Pet } from "@/components/petia/FloatingBubble";
-import { useEffect } from "react";
+import { MOCK_PETS } from "@/lib/mockData";
+import { AppSettingsProvider } from "@/lib/appSettings";
+import { toast } from "sonner";
 
-const MOCK_PETS: Pet[] = [
-  {
-    id: "1",
-    name: "Luna",
-    breed: "Golden Retriever",
-    age: "3y",
-    weight: "28kg",
-    img: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=200",
-  },
-  {
-    id: "2",
-    name: "Milo",
-    breed: "British Shorthair",
-    age: "2y",
-    weight: "5kg",
-    img: "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&q=80&w=200",
-  },
+const TERMS = [
+  "Welcome to Petia. By using this app, you agree to these Terms of Service.",
+  "Petia provides informational pet-care tools. Nothing in the app is veterinary medical advice. Always consult a licensed veterinarian for diagnosis or treatment.",
+  "You must be at least 13 years old to use Petia. You are responsible for the accuracy of pet information you provide.",
+  "Subscriptions are auto-renewable and can be managed in your store account. Refunds follow Apple/Google store policies.",
+  "We may update these Terms from time to time. Continued use means you accept the updated Terms.",
+];
+const PRIVACY = [
+  "Your privacy matters. This Privacy Policy describes how Petia handles your data.",
+  "We collect only what's needed to run the app: account email, pet profiles, photos you upload, and usage logs. Photos and pet data are stored encrypted and isolated to your account.",
+  "AI features are powered by Anthropic. Your data is never used to train AI models. You can disable AI any time in Settings.",
+  "We never sell your personal data. Push notification delivery uses Apple/Google services.",
+  "You can export or delete all your data at any time from the Account screen.",
 ];
 
-const Index = () => {
+const Inner = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [splashExit, setSplashExit] = useState(false);
-  const [screen, setScreen] = useState("home");
-  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [tab, setTab] = useState("home");
+  const [subScreen, setSubScreen] = useState<string | null>(null);
+  const [activePet, setActivePet] = useState<Pet>(MOCK_PETS[0]);
+  const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [activePet] = useState<Pet>(MOCK_PETS[0]);
+  const [showAccount, setShowAccount] = useState(false);
 
-  // Splash timer
   useEffect(() => {
-    const timer = setTimeout(() => setSplashExit(true), 2500);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setSplashExit(true), 2000);
+    return () => clearTimeout(t);
   }, []);
+
+  const openPaywall = () => setShowPaywall(true);
+
+  const handleSelectPet = (pet: Pet) => {
+    if (tab === "pet") {
+      setActivePet(pet);
+      toast.success(`${pet.name} is now active`);
+    } else {
+      setProfileSheet(pet);
+    }
+  };
 
   return (
     <div className="bg-background text-foreground font-sans min-h-screen max-w-md mx-auto relative overflow-hidden shadow-2xl">
-      {/* Splash */}
       <AnimatePresence>
-        {showSplash && !splashExit && (
-          <SplashScreen onFinish={() => setShowSplash(false)} />
-        )}
+        {showSplash && !splashExit && <SplashScreen onFinish={() => setShowSplash(false)} />}
       </AnimatePresence>
       {showSplash && splashExit && <SplashExiter onDone={() => setShowSplash(false)} />}
 
-      {/* Main screens */}
       {!showSplash && (
         <>
           <AnimatePresence mode="wait">
-            {screen === "home" && (
+            {!subScreen && tab === "home" && (
               <HomeScreen
                 pets={MOCK_PETS}
                 activePet={activePet}
-                onSelectPet={setSelectedPet}
-                onOpenScanner={() => setScreen("scanner")}
+                onSelectPet={handleSelectPet}
+                onOpenScanner={() => setTab("scanner")}
+                onOpenAccount={() => setShowAccount(true)}
+                onOpenMoodHistory={() => setSubScreen("mood")}
+                onOpenReminders={() => setSubScreen("reminders")}
+                onOpenInsights={() => setSubScreen("insights")}
               />
             )}
-            {screen === "scanner" && (
-              <FoodScannerScreen onBack={() => setScreen("home")} petName={activePet.name} />
+            {!subScreen && tab === "scanner" && (
+              <FoodScannerScreen petName={activePet.name} onUpgrade={openPaywall} />
             )}
-            {screen === "diary" && <HealthDiaryScreen petName={activePet.name} />}
-            {screen === "chat" && <ChatScreen />}
-            {screen === "profile" && (
-              <ProfileScreen
-                onOpenPaywall={() => setShowPaywall(true)}
-                onOpenExpenses={() => setScreen("expenses")}
+            {!subScreen && tab === "diary" && <HealthDiaryScreen petName={activePet.name} />}
+            {!subScreen && tab === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}
+            {!subScreen && tab === "pet" && (
+              <PetHubScreen
+                pets={MOCK_PETS}
+                activePet={activePet}
+                onSelectPet={(p) => { setActivePet(p); toast.success(`${p.name} is now active`); }}
+                onAddPet={openPaywall}
+                onOpenReminders={() => setSubScreen("reminders")}
+                onOpenWeight={() => setSubScreen("weight")}
+                onOpenVet={() => setSubScreen("vet")}
+                onOpenExpenses={() => setSubScreen("expenses")}
+                onOpenInsights={() => setSubScreen("insights")}
+                onOpenPDF={() => setSubScreen("pdf")}
               />
             )}
-            {screen === "expenses" && (
-              <ExpenseTrackerScreen onBack={() => setScreen("profile")} />
-            )}
+
+            {subScreen === "mood" && <MoodHistoryScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => setSubScreen(null)} />}
+            {subScreen === "weight" && <WeightTrackerScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => setSubScreen(null)} onUpgrade={openPaywall} />}
+            {subScreen === "reminders" && <RemindersScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => setSubScreen(null)} onUpgrade={openPaywall} />}
+            {subScreen === "vet" && <VetVisitsScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => setSubScreen(null)} />}
+            {subScreen === "expenses" && <ExpenseTrackerScreen onBack={() => setSubScreen(null)} />}
+            {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => setSubScreen(null)} onUpgrade={openPaywall} />}
+            {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => setSubScreen(null)} onUpgrade={openPaywall} />}
+            {subScreen === "referral" && <ReferralScreen onBack={() => setSubScreen(null)} />}
+            {subScreen === "terms" && <LegalScreen title="Terms of Service" body={TERMS} onBack={() => setSubScreen(null)} />}
+            {subScreen === "privacy" && <LegalScreen title="Privacy Policy" body={PRIVACY} onBack={() => setSubScreen(null)} />}
           </AnimatePresence>
 
           <AnimatePresence>
             {showPaywall && <PaywallScreen onClose={() => setShowPaywall(false)} />}
           </AnimatePresence>
           <AnimatePresence>
-            {selectedPet && (
-              <PetProfileSheet pet={selectedPet} onClose={() => setSelectedPet(null)} />
+            {profileSheet && <PetProfileSheet pet={profileSheet} onClose={() => setProfileSheet(null)} />}
+          </AnimatePresence>
+          <AnimatePresence>
+            {showAccount && (
+              <AccountSheet
+                onClose={() => setShowAccount(false)}
+                onOpenPaywall={() => { setShowAccount(false); openPaywall(); }}
+                onOpenReferral={() => { setShowAccount(false); setSubScreen("referral"); }}
+                onOpenTerms={() => { setShowAccount(false); setSubScreen("terms"); }}
+                onOpenPrivacy={() => { setShowAccount(false); setSubScreen("privacy"); }}
+              />
             )}
           </AnimatePresence>
 
-          {screen !== "expenses" && <BottomNav activeTab={screen} setTab={setScreen} />}
+          {!subScreen && <BottomNav activeTab={tab} setTab={(t) => { setSubScreen(null); setTab(t); }} />}
         </>
       )}
     </div>
@@ -102,12 +146,16 @@ const Index = () => {
 
 const SplashExiter = ({ onDone }: { onDone: () => void }) => {
   useEffect(() => {
-    const t = setTimeout(onDone, 700);
+    const t = setTimeout(onDone, 600);
     return () => clearTimeout(t);
   }, [onDone]);
-  return (
-    <div className="fixed inset-0 z-[200] bg-background animate-fade-out pointer-events-none" />
-  );
+  return <div className="fixed inset-0 z-[200] bg-background animate-fade-out pointer-events-none" />;
 };
+
+const Index = () => (
+  <AppSettingsProvider>
+    <Inner />
+  </AppSettingsProvider>
+);
 
 export default Index;

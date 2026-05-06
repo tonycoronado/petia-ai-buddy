@@ -1,4 +1,4 @@
-import { Home, Camera, BookHeart, MessageCircle, User } from "lucide-react";
+import { Home, Camera, BookHeart, MessageCircle, PawPrint } from "lucide-react";
 
 interface BottomNavProps {
   activeTab: string;
@@ -10,7 +10,7 @@ const tabs = [
   { id: "scanner", icon: Camera, label: "Scanner" },
   { id: "diary", icon: BookHeart, label: "Diary" },
   { id: "chat", icon: MessageCircle, label: "Chat" },
-  { id: "profile", icon: User, label: "Profile" },
+  { id: "pet", icon: PawPrint, label: "Pet" },
 ];
 
 const BottomNav = ({ activeTab, setTab }: BottomNavProps) => (
@@ -20,9 +20,7 @@ const BottomNav = ({ activeTab, setTab }: BottomNavProps) => (
         key={id}
         onClick={() => setTab(id)}
         className={`p-3 rounded-2xl transition-all duration-200 ${
-          activeTab === id
-            ? "bg-foreground text-background"
-            : "text-muted-foreground hover:text-foreground"
+          activeTab === id ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
         }`}
       >
         <Icon size={22} strokeWidth={2.5} />

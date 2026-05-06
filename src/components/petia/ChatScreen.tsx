@@ -1,123 +1,95 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Send } from "lucide-react";
+import { Send, Sparkles } from "lucide-react";
+import type { Pet } from "./FloatingBubble";
+import { PET_DETAILS } from "@/lib/mockData";
+import { useAppSettings } from "@/lib/appSettings";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-const MOCK_RESPONSES: string[] = [
-  "That's a great question! Based on Luna's profile as a 3-year-old Golden Retriever, I'd recommend monitoring this closely for 24-48 hours. If you notice any changes, it's best to visit your vet.\n\n⚕️ This is not a diagnosis. If you are concerned about Luna's health, please consult a veterinarian.",
-  "Golden Retrievers are prone to hip dysplasia and skin allergies. Since Luna is still young, maintaining a healthy weight and regular exercise is key. I'd suggest 30-60 minutes of moderate activity daily.\n\n⚕️ This is not a diagnosis. If you are concerned about Luna's health, please consult a veterinarian.",
-  "For Luna's coat health, Omega-3 fatty acids are wonderful! You can add fish oil supplements to her food — about 1000mg per day for her weight. It helps with skin, coat, and joint health.\n\n⚕️ This is not a diagnosis. If you are concerned about Luna's health, please consult a veterinarian.",
-  "That's actually quite normal for Golden Retrievers! They tend to shed more during spring and fall. Regular brushing (2-3 times a week) and a good diet will help manage it.\n\n⚕️ This is not a diagnosis. If you are concerned about Luna's health, please consult a veterinarian.",
-];
+interface ChatScreenProps {
+  pet: Pet;
+  onUpgrade: () => void;
+}
 
-const ChatScreen = () => {
+const FREE_LIMIT = 3;
+
+const ChatScreen = ({ pet, onUpgrade }: ChatScreenProps) => {
+  const { isPremium } = useAppSettings();
+  const details = PET_DETAILS[String(pet.id)];
+  const ctxLine = details
+    ? `${pet.breed} • ${pet.age} • ${pet.weight}${details.allergies.length ? ` • allergies: ${details.allergies.join(", ")}` : ""}`
+    : `${pet.breed} • ${pet.age} • ${pet.weight}`;
+
+  const RESPONSES = [
+    `Based on ${pet.name}'s profile (${ctxLine}), I'd monitor closely for 24–48 hours. If symptoms persist or worsen, please book a vet visit.\n\n⚕️ This is not a diagnosis. If you are concerned about ${pet.name}'s health, please consult a veterinarian.`,
+    `${pet.breed}s of ${pet.name}'s age and weight benefit from 30–60 minutes of moderate daily activity. Keep portions consistent with the food you scanned recently.\n\n⚕️ This is not a diagnosis. If you are concerned about ${pet.name}'s health, please consult a veterinarian.`,
+    `For coat and joint support, Omega-3 (fish oil) is well tolerated. ${details?.allergies.length ? `Note ${pet.name}'s allergy to ${details.allergies.join(", ")}.` : ""} I'd start small and observe for 7 days.\n\n⚕️ This is not a diagnosis. If you are concerned about ${pet.name}'s health, please consult a veterinarian.`,
+  ];
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "Hi there! 👋 I'm your Petia care assistant. I know all about Luna — her breed, age, weight, and health history. How can I help today?",
+      content: `Hi! 👋 I'm your Petia care assistant. I know ${pet.name}'s profile (${ctxLine}). How can I help today?`,
     },
   ]);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [count, setCount] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      scrollRef.current?.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }, 50);
-  };
-
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+    setTimeout(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }), 50);
+  }, [messages, typing]);
 
   const handleSend = () => {
-    const trimmed = input.trim();
-    if (!trimmed || isTyping) return;
-
-    const userMsg: Message = { role: "user", content: trimmed };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
-    setIsTyping(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      const response = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
-      setMessages((prev) => [...prev, { role: "assistant", content: response }]);
-      setIsTyping(false);
-    }, 1500 + Math.random() * 1000);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+    const t = input.trim();
+    if (!t || typing) return;
+    if (!isPremium && count >= FREE_LIMIT) {
+      onUpgrade();
+      return;
     }
+    setMessages((m) => [...m, { role: "user", content: t }]);
+    setInput("");
+    setTyping(true);
+    setCount((c) => c + 1);
+    setTimeout(() => {
+      setMessages((m) => [...m, { role: "assistant", content: RESPONSES[Math.floor(Math.random() * RESPONSES.length)] }]);
+      setTyping(false);
+    }, 1500);
   };
+
+  const limitReached = !isPremium && count >= FREE_LIMIT;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="flex flex-col h-screen"
-    >
-      {/* Header */}
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col h-screen">
       <div className="pt-16 px-6 pb-4">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-black tracking-tight text-foreground">
-            AI Care Assistant
-          </h1>
-          <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Online
-          </span>
+          <h1 className="text-2xl font-black tracking-tight text-foreground">AI Care Assistant</h1>
+          {isPremium && (
+            <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full gradient-cta text-primary-foreground">
+              <Sparkles size={10} /> Priority
+            </span>
+          )}
         </div>
         <p className="text-xs text-muted-foreground font-medium mt-0.5">
-          Personalized advice for Luna
+          Personalized for {pet.name} • {ctxLine}
         </p>
       </div>
 
-      {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto px-6 space-y-4 pb-4 no-scrollbar"
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 space-y-4 pb-4 no-scrollbar">
         {messages.map((msg, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i < 2 ? i * 0.15 : 0 }}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[80%] px-5 py-3.5 text-sm leading-relaxed whitespace-pre-line ${
-                msg.role === "user"
-                  ? "gradient-cta text-primary-foreground rounded-3xl rounded-br-lg"
-                  : "glass rounded-3xl rounded-bl-lg text-foreground shadow-soft"
-              }`}
-            >
+          <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[80%] px-5 py-3.5 text-sm leading-relaxed whitespace-pre-line ${msg.role === "user" ? "gradient-cta text-primary-foreground rounded-3xl rounded-br-lg" : "glass rounded-3xl rounded-bl-lg text-foreground shadow-soft"}`}>
               {msg.content}
             </div>
           </motion.div>
         ))}
-
-        {/* Typing indicator */}
-        {isTyping && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex justify-start"
-          >
+        {typing && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
             <div className="glass rounded-3xl rounded-bl-lg px-5 py-3.5 shadow-soft flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-muted-foreground animate-pulse" />
               <span className="w-2 h-2 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: "0.2s" }} />
@@ -125,28 +97,37 @@ const ChatScreen = () => {
             </div>
           </motion.div>
         )}
+        {limitReached && (
+          <button onClick={onUpgrade} className="w-full glass rounded-3xl p-4 shadow-soft text-left flex items-center gap-3 border border-primary/20">
+            <div className="w-9 h-9 rounded-2xl gradient-cta flex items-center justify-center text-primary-foreground"><Sparkles size={16} /></div>
+            <div className="flex-1">
+              <p className="font-black text-foreground text-sm">Free chat limit reached</p>
+              <p className="text-[11px] text-muted-foreground font-medium">Upgrade for unlimited priority AI chat</p>
+            </div>
+          </button>
+        )}
       </div>
 
-      {/* Input */}
       <div className="px-6 pb-32 pt-2">
         <div className="glass rounded-3xl flex items-center gap-3 px-5 py-3 shadow-soft">
           <input
             type="text"
-            placeholder="Ask about Luna's health..."
+            placeholder={`Ask about ${pet.name}'s health...`}
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isTyping}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
+            disabled={typing || limitReached}
           />
-          <button
-            onClick={handleSend}
-            disabled={isTyping || !input.trim()}
-            className="w-10 h-10 rounded-full gradient-cta flex items-center justify-center text-primary-foreground shrink-0 disabled:opacity-50"
-          >
+          <button onClick={handleSend} disabled={typing || !input.trim() || limitReached} className="w-10 h-10 rounded-full gradient-cta flex items-center justify-center text-primary-foreground shrink-0 disabled:opacity-50">
             <Send size={18} />
           </button>
         </div>
+        {!isPremium && !limitReached && (
+          <p className="text-[10px] text-muted-foreground font-medium text-center mt-2">
+            {FREE_LIMIT - count} free messages left today
+          </p>
+        )}
       </div>
     </motion.div>
   );
