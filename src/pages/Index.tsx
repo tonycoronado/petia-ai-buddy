@@ -140,7 +140,7 @@ const Inner = () => {
             )}
           </AnimatePresence>
 
-          {!subScreen && <BottomNav activeTab={tab} setTab={(t) => { pop(); setTab(t); }} />}
+          {!subScreen && <BottomNav activeTab={tab} setTab={(t) => { reset(); setTab(t); }} />}
         </>
       )}
     </div>
