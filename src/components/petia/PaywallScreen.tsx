@@ -13,7 +13,6 @@ const FEATURES = [
   "Visual Health Diary + AI Triage",
   "Mood Patterns & Insights",
   "Smart AI Reminders",
-  "Expense Tracker",
   "Unlimited Pet Profiles",
   "Priority AI Care Chat",
   "Vet Visit PDF Export",
@@ -51,7 +50,7 @@ const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
           Give your pet the premium care they deserve. Less than a bag of treats per month.
         </p>
 
-        <div className="space-y-3 mb-10">
+        <div className="space-y-3 mb-4">
           {FEATURES.map((feature) => (
             <div key={feature} className="flex items-center gap-3">
               <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
@@ -61,6 +60,9 @@ const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
             </div>
           ))}
         </div>
+        <p className="text-[11px] text-muted-foreground font-medium mb-10 px-1">
+          Vet Records OCR Import is free for everyone.
+        </p>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <motion.button whileTap={{ scale: 0.96 }} onClick={() => setPlan("monthly")} className={`p-6 rounded-4xl border-2 text-left transition-all ${plan === "monthly" ? "border-primary bg-primary/5" : "border-border bg-muted/50"}`}>

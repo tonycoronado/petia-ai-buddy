@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ChevronLeft, Sparkles, Smile, Camera, Stethoscope, DollarSign } from "lucide-react";
+import { ChevronLeft, Sparkles, Smile, Camera, Stethoscope } from "lucide-react";
 import { MOCK_INSIGHTS } from "@/lib/mockData";
 import FloatingBubble, { type Pet } from "./FloatingBubble";
 import EmptyState from "./EmptyState";
@@ -39,7 +39,7 @@ const WeeklyInsightsScreen = ({ pet, onBack, onUpgrade }: WeeklyInsightsScreenPr
       {!isPremium ? (
         <PremiumGate
           title="AI Weekly Insights"
-          description={`Get a personalized weekly report on ${pet.name}'s mood, food, health, and spending.`}
+          description={`Get a personalized weekly report on ${pet.name}'s mood, food, and health.`}
           onUpgrade={onUpgrade}
         />
       ) : !current ? (
@@ -57,7 +57,6 @@ const WeeklyInsightsScreen = ({ pet, onBack, onUpgrade }: WeeklyInsightsScreenPr
               { icon: Smile, label: "Mood", text: current.moodTrend },
               { icon: Camera, label: "Food", text: current.foodInsights },
               { icon: Stethoscope, label: "Health", text: current.healthSummary },
-              { icon: DollarSign, label: "Spending", text: current.spending },
             ].map((s) => (
               <div key={s.label} className="flex gap-3 mb-4 last:mb-0">
                 <div className="w-9 h-9 rounded-2xl bg-secondary flex items-center justify-center text-foreground shrink-0">

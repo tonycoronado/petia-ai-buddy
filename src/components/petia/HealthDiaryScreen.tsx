@@ -6,13 +6,15 @@ interface HealthDiaryScreenProps {
   petName: string;
 }
 
+type Severity = "Observe" | "Minor Change" | "Consider Vet" | "Needs Attention";
+
 interface DiaryEntry {
   id: string;
   date: string;
   category: string;
   title: string;
   description: string;
-  status: "Improving" | "Monitoring" | "Resolved";
+  status: Severity;
   img: string;
 }
 
@@ -21,44 +23,45 @@ const MOCK_ENTRIES: DiaryEntry[] = [
     id: "1",
     date: "Apr 6",
     category: "Skin",
-    title: "Minor skin irritation on left ear",
-    description: "Redness noticed behind left ear. AI assessment: Possible mild allergic reaction. Monitor for 48 hours.",
-    status: "Monitoring",
+    title: "Redness behind left ear",
+    description: "Small patch of pink skin behind the left ear. The fur around it looks normal. Worth showing to the vet at the next visit.",
+    status: "Minor Change",
     img: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=200",
   },
   {
     id: "2",
     date: "Apr 2",
     category: "Eyes",
-    title: "Slight discharge from right eye",
-    description: "Small amount of clear discharge. AI assessment: Likely minor irritation. Clean gently with warm water.",
-    status: "Improving",
+    title: "Slight clear discharge from right eye",
+    description: "A small amount of clear discharge in the inner corner of the right eye. Eye looks bright and open otherwise.",
+    status: "Observe",
     img: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&q=80&w=200",
   },
   {
     id: "3",
     date: "Mar 28",
     category: "Mobility",
-    title: "Slight limp after morning walk",
-    description: "Favoring right front leg after exercise. AI assessment: Could be minor strain. Rest for 24 hours.",
-    status: "Resolved",
+    title: "Favoring right front leg after walk",
+    description: "Holding the right front paw up briefly after the morning walk. Walking normally again after resting.",
+    status: "Observe",
     img: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=200",
   },
   {
     id: "4",
     date: "Mar 20",
     category: "Digestive",
-    title: "Upset stomach after new treats",
-    description: "Mild vomiting after trying new brand treats. AI assessment: Likely food sensitivity. Avoid this brand.",
-    status: "Resolved",
+    title: "Soft stool after new treats",
+    description: "Stool appearance changed after trying a new treat brand. Energy and appetite look normal.",
+    status: "Minor Change",
     img: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=200",
   },
 ];
 
-const STATUS_STYLES: Record<string, string> = {
-  Improving: "bg-primary/15 text-primary",
-  Monitoring: "bg-warning text-warning-foreground",
-  Resolved: "bg-muted text-muted-foreground",
+const STATUS_STYLES: Record<Severity, string> = {
+  "Observe": "bg-emerald-100 text-emerald-700",
+  "Minor Change": "bg-warning text-warning-foreground",
+  "Consider Vet": "bg-orange-100 text-orange-700",
+  "Needs Attention": "bg-destructive/15 text-destructive",
 };
 
 const HealthDiaryScreen = ({ petName }: HealthDiaryScreenProps) => {
@@ -72,16 +75,17 @@ const HealthDiaryScreen = ({ petName }: HealthDiaryScreenProps) => {
       className="pt-16 px-6 pb-32"
     >
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-black tracking-tight text-foreground">Health Diary</h1>
+        <h1 className="text-3xl font-black tracking-tight text-foreground">Photo Journal</h1>
         <motion.button
           whileTap={{ scale: 0.9 }}
+          aria-label="Add observation"
           className="w-10 h-10 rounded-2xl gradient-cta flex items-center justify-center text-primary-foreground shadow-glow"
         >
           <Camera size={18} />
         </motion.button>
       </div>
       <p className="text-sm text-muted-foreground font-medium mb-8">
-        {petName}'s visual health timeline
+        Photo journal of {petName}'s observations — share with your vet.
       </p>
 
       {/* Timeline */}
@@ -126,7 +130,7 @@ const HealthDiaryScreen = ({ petName }: HealthDiaryScreenProps) => {
       {/* Disclaimer */}
       <div className="mt-6 glass rounded-3xl p-4 shadow-soft">
         <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">
-          ⚕️ This is not a diagnosis. If you are concerned about {petName}'s health, please consult a veterinarian.
+          ⚕️ This is observational only — it is not medical advice. A licensed veterinarian is the only source of diagnosis or treatment.
         </p>
       </div>
 
@@ -175,17 +179,21 @@ const HealthDiaryScreen = ({ petName }: HealthDiaryScreenProps) => {
               </div>
 
               <span
-                className={`inline-block text-[10px] font-black uppercase px-3 py-1.5 rounded-full mb-6 ${STATUS_STYLES[selectedEntry.status]}`}
+                className={`inline-block text-[10px] font-black uppercase px-3 py-1.5 rounded-full mb-4 ${STATUS_STYLES[selectedEntry.status]}`}
               >
-                Status: {selectedEntry.status}
+                {selectedEntry.status}
               </span>
+
+              <p className="text-[10px] text-muted-foreground font-medium leading-relaxed mb-6">
+                ⚕️ This is observational only — it is not medical advice. A licensed veterinarian is the only source of diagnosis or treatment.
+              </p>
 
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setSelectedEntry(null)}
                 className="w-full py-4 gradient-cta text-primary-foreground rounded-3xl font-bold shadow-glow"
               >
-                Take Follow-up Photo
+                Add follow-up photo
               </motion.button>
             </motion.div>
           </>
