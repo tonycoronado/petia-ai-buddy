@@ -4,9 +4,9 @@ import {
   Bell,
   Scale,
   Stethoscope,
-  DollarSign,
   Sparkles,
   FileText,
+  ScanLine,
   Siren,
   Pencil,
   Cake,
@@ -28,7 +28,7 @@ interface PetHubScreenProps {
   onOpenReminders: () => void;
   onOpenWeight: () => void;
   onOpenVet: () => void;
-  onOpenExpenses: () => void;
+  onOpenImport: () => void;
   onOpenInsights: () => void;
   onOpenPDF: () => void;
 }
@@ -37,7 +37,7 @@ const TOOL_TILES = [
   { id: "reminders", label: "Reminders", icon: Bell, key: "onOpenReminders" },
   { id: "weight", label: "Weight", icon: Scale, key: "onOpenWeight" },
   { id: "vet", label: "Vet Visits", icon: Stethoscope, key: "onOpenVet" },
-  { id: "expenses", label: "Expenses", icon: DollarSign, key: "onOpenExpenses" },
+  { id: "import", label: "Import Vet Records", icon: ScanLine, key: "onOpenImport" },
   { id: "insights", label: "Weekly Insights", icon: Sparkles, key: "onOpenInsights" },
   { id: "pdf", label: "Health PDF", icon: FileText, key: "onOpenPDF" },
 ];
