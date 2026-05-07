@@ -7,7 +7,7 @@ import ChatScreen from "@/components/petia/ChatScreen";
 import PetHubScreen from "@/components/petia/pet/PetHubScreen";
 import PetProfileSheet from "@/components/petia/PetProfileSheet";
 import PaywallScreen from "@/components/petia/PaywallScreen";
-import ExpenseTrackerScreen from "@/components/petia/ExpenseTrackerScreen";
+import ImportVetRecordsScreen from "@/components/petia/ImportVetRecordsScreen";
 import MoodHistoryScreen from "@/components/petia/MoodHistoryScreen";
 import WeightTrackerScreen from "@/components/petia/WeightTrackerScreen";
 import RemindersScreen from "@/components/petia/RemindersScreen";
@@ -25,7 +25,7 @@ import { AppSettingsProvider } from "@/lib/appSettings";
 import { useScreenStack } from "@/lib/useScreenStack";
 import { toast } from "sonner";
 
-type SubScreenId = "mood" | "weight" | "reminders" | "vet" | "expenses" | "insights" | "pdf" | "referral" | "terms" | "privacy";
+type SubScreenId = "mood" | "weight" | "reminders" | "vet" | "import" | "insights" | "pdf" | "referral" | "terms" | "privacy";
 
 const TERMS = [
   "Welcome to Petia. By using this app, you agree to these Terms of Service.",
@@ -104,17 +104,17 @@ const Inner = () => {
                 onOpenReminders={() => push("reminders" as SubScreenId)}
                 onOpenWeight={() => push("weight" as SubScreenId)}
                 onOpenVet={() => push("vet" as SubScreenId)}
-                onOpenExpenses={() => push("expenses" as SubScreenId)}
+                onOpenImport={() => push("import" as SubScreenId)}
                 onOpenInsights={() => push("insights" as SubScreenId)}
                 onOpenPDF={() => push("pdf" as SubScreenId)}
               />
             )}
 
             {subScreen === "mood" && <MoodHistoryScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
-            {subScreen === "weight" && <WeightTrackerScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
+            {subScreen === "weight" && <WeightTrackerScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
             {subScreen === "reminders" && <RemindersScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "vet" && <VetVisitsScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
-            {subScreen === "expenses" && <ExpenseTrackerScreen onBack={() => pop()} />}
+            {subScreen === "import" && <ImportVetRecordsScreen petName={activePet.name} mode="profile" onBack={() => pop()} onSkip={() => pop()} onComplete={() => pop()} />}
             {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "referral" && <ReferralScreen onBack={() => pop()} />}

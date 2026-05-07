@@ -60,7 +60,7 @@ const PetHubScreen = (props: PetHubScreenProps) => {
     onOpenReminders: props.onOpenReminders,
     onOpenWeight: props.onOpenWeight,
     onOpenVet: props.onOpenVet,
-    onOpenExpenses: props.onOpenExpenses,
+    onOpenImport: props.onOpenImport,
     onOpenInsights: props.onOpenInsights,
     onOpenPDF: props.onOpenPDF,
   };
