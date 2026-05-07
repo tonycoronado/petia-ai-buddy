@@ -6,18 +6,16 @@ import { MOCK_WEIGHT, type WeightEntry } from "@/lib/mockData";
 import { useAppSettings, kgToDisplay } from "@/lib/appSettings";
 import { triggerHaptic } from "@/lib/haptic";
 import { toast } from "sonner";
-import PremiumGate from "./PremiumGate";
 import EmptyState from "./EmptyState";
 
 interface WeightTrackerScreenProps {
   petId: string;
   petName: string;
   onBack: () => void;
-  onUpgrade: () => void;
 }
 
-const WeightTrackerScreen = ({ petId, petName, onBack, onUpgrade }: WeightTrackerScreenProps) => {
-  const { units, setUnits, isPremium } = useAppSettings();
+const WeightTrackerScreen = ({ petId, petName, onBack }: WeightTrackerScreenProps) => {
+  const { units, setUnits } = useAppSettings();
   const [entries, setEntries] = useState<WeightEntry[]>(MOCK_WEIGHT[petId] ?? []);
   const [showAdd, setShowAdd] = useState(false);
   const [newWeight, setNewWeight] = useState("");
