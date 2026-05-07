@@ -6,18 +6,16 @@ import { MOCK_WEIGHT, type WeightEntry } from "@/lib/mockData";
 import { useAppSettings, kgToDisplay } from "@/lib/appSettings";
 import { triggerHaptic } from "@/lib/haptic";
 import { toast } from "sonner";
-import PremiumGate from "./PremiumGate";
 import EmptyState from "./EmptyState";
 
 interface WeightTrackerScreenProps {
   petId: string;
   petName: string;
   onBack: () => void;
-  onUpgrade: () => void;
 }
 
-const WeightTrackerScreen = ({ petId, petName, onBack, onUpgrade }: WeightTrackerScreenProps) => {
-  const { units, setUnits, isPremium } = useAppSettings();
+const WeightTrackerScreen = ({ petId, petName, onBack }: WeightTrackerScreenProps) => {
+  const { units, setUnits } = useAppSettings();
   const [entries, setEntries] = useState<WeightEntry[]>(MOCK_WEIGHT[petId] ?? []);
   const [showAdd, setShowAdd] = useState(false);
   const [newWeight, setNewWeight] = useState("");
@@ -124,32 +122,6 @@ const WeightTrackerScreen = ({ petId, petName, onBack, onUpgrade }: WeightTracke
             </div>
           </div>
 
-          {/* AI Projection */}
-          {isPremium ? (
-            <div className="glass rounded-4xl p-5 shadow-soft mb-6 border border-primary/20">
-              <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">
-                AI Weight Projection
-              </p>
-              <p className="text-sm font-bold text-foreground mb-1">
-                Trend: {trendLabel} (~{Math.abs(delta).toFixed(2)} kg/month)
-              </p>
-              <p className="text-xs text-muted-foreground font-medium leading-relaxed">
-                Projected in 3 months: {kgToDisplay(latest.kg + delta * 3, units)}. Projected in 6 months: {kgToDisplay(latest.kg + delta * 6, units)}.
-                {Math.abs(delta) < 0.1
-                  ? ` ${petName}'s weight is healthy and stable. Keep current routine.`
-                  : ` Monitor portion sizes and activity to keep ${petName} in a healthy range.`}
-              </p>
-            </div>
-          ) : (
-            <div className="mb-6">
-              <PremiumGate
-                title="AI Weight Projection"
-                description="Predict 3 & 6-month weight trajectory and get personalized recommendations."
-                onUpgrade={onUpgrade}
-                compact
-              />
-            </div>
-          )}
 
           {/* Log */}
           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3 px-1">

@@ -8,6 +8,7 @@ import StepSpecies from "./onboarding/StepSpecies";
 import StepAge from "./onboarding/StepAge";
 import StepWeight from "./onboarding/StepWeight";
 import StepPhoto from "./onboarding/StepPhoto";
+import StepImportRecords from "./onboarding/StepImportRecords";
 import StepAIConsent from "./onboarding/StepAIConsent";
 import StepPermissions from "./onboarding/StepPermissions";
 import StepLoading from "./onboarding/StepLoading";
@@ -42,15 +43,15 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
     weightRange: "medium", weightValue: 25, photoUrl: null, photoFile: null,
   });
 
-  const TOTAL = 10;
+  const TOTAL = 11;
   const progress = ((step + 1) / TOTAL) * 100;
 
   const next = useCallback(() => { setDirection(1); setStep((s) => Math.min(s + 1, TOTAL - 1)); }, []);
   const back = useCallback(() => { setDirection(-1); setStep((s) => Math.max(s - 1, 0)); }, []);
   const update = useCallback((p: Partial<PetData>) => setPetData((d) => ({ ...d, ...p })), []);
 
-  // No back on Welcome (0), Loading (8), Auth (9)
-  const showBack = step > 0 && step !== 8 && step !== TOTAL - 1;
+  // No back on Welcome (0), Loading (9), Auth (10)
+  const showBack = step > 0 && step !== 9 && step !== TOTAL - 1;
 
   const wrap = (key: string, content: React.ReactNode) => (
     <motion.div key={key} custom={direction} variants={slide} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="w-full max-w-sm">
@@ -78,10 +79,11 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
           {step === 3 && wrap("age", <StepAge petData={petData} update={update} next={next} />)}
           {step === 4 && wrap("weight", <StepWeight petData={petData} update={update} next={next} />)}
           {step === 5 && wrap("photo", <StepPhoto petData={petData} update={update} next={next} />)}
-          {step === 6 && wrap("ai", <StepAIConsent next={next} />)}
-          {step === 7 && wrap("perms", <StepPermissions next={next} />)}
-          {step === 8 && wrap("loading", <StepLoading petData={petData} next={next} />)}
-          {step === 9 && wrap("auth", <StepAuth petData={petData} onComplete={onComplete} />)}
+          {step === 6 && wrap("import", <StepImportRecords petData={petData} next={next} />)}
+          {step === 7 && wrap("ai", <StepAIConsent next={next} />)}
+          {step === 8 && wrap("perms", <StepPermissions next={next} />)}
+          {step === 9 && wrap("loading", <StepLoading petData={petData} next={next} />)}
+          {step === 10 && wrap("auth", <StepAuth petData={petData} onComplete={onComplete} />)}
         </AnimatePresence>
       </div>
     </motion.div>

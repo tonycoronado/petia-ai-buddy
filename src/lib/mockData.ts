@@ -170,7 +170,6 @@ export interface WeeklyInsight {
   moodTrend: string;
   foodInsights: string;
   healthSummary: string;
-  spending: string;
   recommendations: string[];
   current?: boolean;
 }
@@ -182,8 +181,7 @@ export const MOCK_INSIGHTS: WeeklyInsight[] = [
     weekOf: "Apr 1 – Apr 7",
     moodTrend: "Mostly happy with a single quiet day. Mood is trending positive vs last week.",
     foodInsights: "All scans came back Good. Royal Canin Adult Medium remains the best match.",
-    healthSummary: "Skin entry from Apr 6 is being monitored. No new concerns logged this week.",
-    spending: "$163.99 spent — slightly above your monthly average pace.",
+    healthSummary: "Skin entry from Apr 6 is being observed. No new concerns logged this week.",
     recommendations: [
       "Add a 15-min evening walk on quiet days to boost mood balance.",
       "Schedule the upcoming annual rabies booster on Apr 21.",
@@ -198,7 +196,6 @@ export const MOCK_INSIGHTS: WeeklyInsight[] = [
     moodTrend: "Stable, happy week with one energetic spike on Saturday.",
     foodInsights: "1 Okay scan flagged a generic kibble — recommended brand swap.",
     healthSummary: "No new health diary entries.",
-    spending: "$98.50 spent.",
     recommendations: ["Maintain current feeding routine.", "Consider a longer Sunday walk."],
   },
 ];
@@ -219,49 +216,52 @@ export const MOCK_SCAN_HISTORY: ScanHistoryEntry[] = [
   { id: "s4", date: "Mar 22", title: "Salmon Fillet (cooked)", brand: "Home meal", score: "Good", thumb: "https://images.unsplash.com/photo-1574781330855-d0db8cc6a79c?auto=format&fit=crop&q=80&w=200" },
 ];
 
-export interface YearlyMonth {
-  month: string;
-  amount: number;
+export interface OcrVetVisit {
+  date: string;
+  reason: string;
+  clinic: string;
+  vet: string;
 }
 
-export const MOCK_YEARLY_EXPENSES: YearlyMonth[] = [
-  { month: "Jan", amount: 240.5 },
-  { month: "Feb", amount: 198.0 },
-  { month: "Mar", amount: 312.75 },
-  { month: "Apr", amount: 306.48 },
-  { month: "May", amount: 0 },
-  { month: "Jun", amount: 0 },
-  { month: "Jul", amount: 0 },
-  { month: "Aug", amount: 0 },
-  { month: "Sep", amount: 0 },
-  { month: "Oct", amount: 0 },
-  { month: "Nov", amount: 0 },
-  { month: "Dec", amount: 0 },
-];
-
-export const MOCK_YEARLY_TOP_CATEGORIES = [
-  { category: "Vet", amount: 420.0, percent: 40 },
-  { category: "Food", amount: 298.5, percent: 28 },
-  { category: "Insurance", amount: 140.0, percent: 13 },
-  { category: "Grooming", amount: 135.0, percent: 13 },
-  { category: "Toys", amount: 64.23, percent: 6 },
-];
-
-export interface AIExpenseEstimate {
-  predicted: number;
-  confidence: "High" | "Medium" | "Low";
-  basis: string;
-  breakdown: { label: string; value: string }[];
+export interface OcrVaccination {
+  name: string;
+  given: string;
+  nextDue?: string;
 }
 
-export const MOCK_AI_EXPENSE_ESTIMATE: AIExpenseEstimate = {
-  predicted: 295,
-  confidence: "High",
-  basis: "Based on 4 months of history",
-  breakdown: [
-    { label: "3-month average", value: "$272.41" },
-    { label: "Recurring (insurance + food)", value: "$97.99" },
-    { label: "Seasonal trend (spring grooming)", value: "+$18.00" },
-    { label: "Vet visits (none expected)", value: "$0.00" },
+export interface OcrMedication {
+  name: string;
+  dose: string;
+  unit: string;
+  frequency: string;
+  start: string;
+  end: string;
+}
+
+export interface OcrResult {
+  visits: OcrVetVisit[];
+  vaccinations: OcrVaccination[];
+  medications: OcrMedication[];
+  warnings: string[];
+}
+
+export const MOCK_OCR_RESULT: OcrResult = {
+  visits: [
+    { date: "Nov 14, 2024", reason: "Annual wellness exam", clinic: "Bay Animal Hospital", vet: "Dr. Patel" },
+    { date: "Jun 3, 2024", reason: "Itchy ears check", clinic: "Bay Animal Hospital", vet: "Dr. Patel" },
+    { date: "Feb 9, 2023", reason: "Spay surgery", clinic: "Bay Animal Hospital", vet: "Dr. Lin" },
+  ],
+  vaccinations: [
+    { name: "Rabies (3-year)", given: "Nov 14, 2024", nextDue: "Nov 14, 2027" },
+    { name: "DHPP booster", given: "Nov 14, 2024", nextDue: "Nov 14, 2025" },
+    { name: "Bordetella", given: "Jun 3, 2024", nextDue: "Jun 3, 2025" },
+    { name: "Leptospirosis", given: "Nov 14, 2024" },
+  ],
+  medications: [
+    { name: "Apoquel", dose: "5.4", unit: "mg", frequency: "Once daily", start: "Jun 3, 2024", end: "Jun 17, 2024" },
+    { name: "NexGard", dose: "1", unit: "chew", frequency: "Monthly", start: "Jan 1, 2024", end: "Dec 1, 2024" },
+  ],
+  warnings: [
+    "Image 3: handwriting on the prescription was partly illegible — please verify the dose.",
   ],
 };

@@ -28,7 +28,7 @@ const STATUS_CONFIG = {
     border: "border-warning/50",
     pillBg: "bg-warning-foreground/10",
     pillText: "text-warning-foreground",
-    label: "Cautionary Analysis",
+    label: "Worth a Look",
     icon: Info,
   },
   Red: {
@@ -36,7 +36,7 @@ const STATUS_CONFIG = {
     border: "border-red-200",
     pillBg: "bg-red-200/60",
     pillText: "text-red-800",
-    label: "Urgent Analysis",
+    label: "Needs Attention",
     icon: AlertTriangle,
   },
 };
@@ -67,13 +67,16 @@ const ResultScreen = ({ result, onSave, onChat, onDismiss }: ResultScreenProps) 
           </h2>
         </div>
 
-        <div className="space-y-4 mb-10">
+        <div className="space-y-4 mb-6">
           <div className="flex gap-4">
             <div className="w-1 bg-petia-teal rounded-full flex-shrink-0" />
             <p className="text-muted-foreground font-medium leading-relaxed">
               {result.description}
             </p>
           </div>
+          <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">
+            ⚕️ This is observational only — it is not medical advice. A licensed veterinarian is the only source of diagnosis or treatment.
+          </p>
         </div>
 
         <div className="space-y-3">
