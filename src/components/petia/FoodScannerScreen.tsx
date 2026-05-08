@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Loader2, ShieldCheck, AlertTriangle, Info, X, History, ImageIcon } from "lucide-react";
+import { Camera, Loader2, ShieldCheck, AlertTriangle, Info, X, History, ImageIcon, ChevronLeft } from "lucide-react";
 import { MOCK_SCAN_HISTORY, type ScanHistoryEntry } from "@/lib/mockData";
 import { useAppSettings } from "@/lib/appSettings";
 import { triggerHaptic } from "@/lib/haptic";
@@ -11,6 +11,7 @@ import PremiumGate from "./PremiumGate";
 interface FoodScannerScreenProps {
   petName: string;
   onUpgrade: () => void;
+  onBack?: () => void;
 }
 
 interface ScanResult {
@@ -73,7 +74,7 @@ const SCORE_CONFIG = {
 
 const FREE_SCAN_LIMIT = 3;
 
-const FoodScannerScreen = ({ petName, onUpgrade }: FoodScannerScreenProps) => {
+const FoodScannerScreen = ({ petName, onUpgrade, onBack }: FoodScannerScreenProps) => {
   const { isPremium } = useAppSettings();
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
@@ -108,12 +109,19 @@ const FoodScannerScreen = ({ petName, onUpgrade }: FoodScannerScreenProps) => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-12 px-6 pb-32 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <div>
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-muted">
+              <ChevronLeft size={22} className="text-foreground" />
+            </button>
+          )}
+          <div>
           <h1 className="text-2xl font-black tracking-tight text-foreground">AI Food Scanner</h1>
           <p className="text-xs text-muted-foreground font-medium">
             Personalized for {petName}
             {!isPremium && ` • ${Math.max(0, FREE_SCAN_LIMIT - scanCount)} free scans left`}
           </p>
+          </div>
         </div>
         <button
           onClick={() => setView(view === "scan" ? "history" : "scan")}

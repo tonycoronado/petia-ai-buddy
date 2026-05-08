@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, X, ChevronRight } from "lucide-react";
+import { Camera, X, ChevronRight, ChevronLeft } from "lucide-react";
 
 interface HealthDiaryScreenProps {
   petName: string;
+  onBack?: () => void;
 }
 
 type Severity = "Observe" | "Minor Change" | "Consider Vet" | "Needs Attention";
@@ -64,7 +65,7 @@ const STATUS_STYLES: Record<Severity, string> = {
   "Needs Attention": "bg-destructive/15 text-destructive",
 };
 
-const HealthDiaryScreen = ({ petName }: HealthDiaryScreenProps) => {
+const HealthDiaryScreen = ({ petName, onBack }: HealthDiaryScreenProps) => {
   const [selectedEntry, setSelectedEntry] = useState<DiaryEntry | null>(null);
 
   return (
@@ -72,10 +73,17 @@ const HealthDiaryScreen = ({ petName }: HealthDiaryScreenProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="pt-16 px-6 pb-32"
+      className="pt-12 px-6 pb-32"
     >
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-black tracking-tight text-foreground">Photo Journal</h1>
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-muted">
+              <ChevronLeft size={22} className="text-foreground" />
+            </button>
+          )}
+          <h1 className="text-3xl font-black tracking-tight text-foreground">Photo Journal</h1>
+        </div>
         <motion.button
           whileTap={{ scale: 0.9 }}
           aria-label="Add observation"

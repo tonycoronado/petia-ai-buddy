@@ -18,6 +18,7 @@ import AccountSheet from "@/components/petia/account/AccountSheet";
 import ReferralScreen from "@/components/petia/account/ReferralScreen";
 import LegalScreen from "@/components/petia/account/LegalScreen";
 import BottomNav from "@/components/petia/BottomNav";
+import CaptureSheet, { type CaptureAction } from "@/components/petia/CaptureSheet";
 import SplashScreen from "@/components/petia/SplashScreen";
 import type { Pet } from "@/components/petia/FloatingBubble";
 import { MOCK_PETS } from "@/lib/mockData";
@@ -25,7 +26,19 @@ import { AppSettingsProvider } from "@/lib/appSettings";
 import { useScreenStack } from "@/lib/useScreenStack";
 import { toast } from "sonner";
 
-type SubScreenId = "mood" | "weight" | "reminders" | "vet" | "import" | "insights" | "pdf" | "referral" | "terms" | "privacy";
+type SubScreenId =
+  | "mood"
+  | "weight"
+  | "reminders"
+  | "vet"
+  | "import"
+  | "insights"
+  | "pdf"
+  | "scanner"
+  | "diary"
+  | "referral"
+  | "terms"
+  | "privacy";
 
 const TERMS = [
   "Welcome to Petia. By using this app, you agree to these Terms of Service.",
@@ -51,6 +64,7 @@ const Inner = () => {
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
+  const [showCapture, setShowCapture] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setSplashExit(true), 2000);
@@ -59,13 +73,51 @@ const Inner = () => {
 
   const openPaywall = () => setShowPaywall(true);
 
-  const handleSelectPet = (pet: Pet) => {
-    if (tab === "pet") {
-      setActivePet(pet);
-      toast.success(`${pet.name} is now active`);
-    } else {
-      setProfileSheet(pet);
+  const handleSwitchPet = (pet: Pet) => {
+    if (String(pet.id) === String(activePet.id)) return;
+    setActivePet(pet);
+    toast.success(`${pet.name} is now active`);
+  };
+
+  const handleAccountTab = () => {
+    setShowAccount(true);
+  };
+
+  const handleCapture = (action: CaptureAction) => {
+    setShowCapture(false);
+    switch (action) {
+      case "scan":
+        push("scanner");
+        break;
+      case "mood":
+        if (tab !== "home") setTab("home");
+        toast.success(`Tap a mood for ${activePet.name}`);
+        break;
+      case "diary":
+        push("diary");
+        break;
+      case "weight":
+        push("weight");
+        break;
+      case "reminder":
+        push("reminders");
+        break;
+      case "vet":
+        push("vet");
+        break;
+      case "import":
+        push("import");
+        break;
     }
+  };
+
+  const handleSetTab = (t: string) => {
+    if (t === "account") {
+      handleAccountTab();
+      return;
+    }
+    reset();
+    setTab(t);
   };
 
   return (
@@ -82,34 +134,39 @@ const Inner = () => {
               <HomeScreen
                 pets={MOCK_PETS}
                 activePet={activePet}
-                onSelectPet={handleSelectPet}
-                onOpenScanner={() => setTab("scanner")}
+                onSwitchPet={handleSwitchPet}
+                onLongPressPet={(p) => setProfileSheet(p)}
                 onOpenAccount={() => setShowAccount(true)}
-                onOpenMoodHistory={() => push("mood" as SubScreenId)}
-                onOpenReminders={() => push("reminders" as SubScreenId)}
-                onOpenInsights={() => push("insights" as SubScreenId)}
+                onOpenMoodHistory={() => push("mood")}
+                onOpenReminders={() => push("reminders")}
+                onOpenInsights={() => push("insights")}
+                onOpenScanner={() => push("scanner")}
+                onOpenDiary={() => push("diary")}
               />
             )}
-            {!subScreen && tab === "scanner" && (
-              <FoodScannerScreen petName={activePet.name} onUpgrade={openPaywall} />
-            )}
-            {!subScreen && tab === "diary" && <HealthDiaryScreen petName={activePet.name} />}
-            {!subScreen && tab === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}
-            {!subScreen && tab === "pet" && (
+            {!subScreen && tab === "care" && (
               <PetHubScreen
                 pets={MOCK_PETS}
                 activePet={activePet}
-                onSelectPet={(p) => { setActivePet(p); toast.success(`${p.name} is now active`); }}
+                onSwitchPet={handleSwitchPet}
+                onLongPressPet={(p) => setProfileSheet(p)}
                 onAddPet={openPaywall}
-                onOpenReminders={() => push("reminders" as SubScreenId)}
-                onOpenWeight={() => push("weight" as SubScreenId)}
-                onOpenVet={() => push("vet" as SubScreenId)}
-                onOpenImport={() => push("import" as SubScreenId)}
-                onOpenInsights={() => push("insights" as SubScreenId)}
-                onOpenPDF={() => push("pdf" as SubScreenId)}
+                onOpenReminders={() => push("reminders")}
+                onOpenWeight={() => push("weight")}
+                onOpenVet={() => push("vet")}
+                onOpenDiary={() => push("diary")}
+                onOpenImport={() => push("import")}
+                onOpenInsights={() => push("insights")}
+                onOpenPDF={() => push("pdf")}
+                onOpenMoodHistory={() => push("mood")}
               />
             )}
+            {!subScreen && tab === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}
 
+            {subScreen === "scanner" && (
+              <FoodScannerScreen petName={activePet.name} onUpgrade={openPaywall} onBack={() => pop()} />
+            )}
+            {subScreen === "diary" && <HealthDiaryScreen petName={activePet.name} onBack={() => pop()} />}
             {subScreen === "mood" && <MoodHistoryScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
             {subScreen === "weight" && <WeightTrackerScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
             {subScreen === "reminders" && <RemindersScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
@@ -129,18 +186,33 @@ const Inner = () => {
             {profileSheet && <PetProfileSheet pet={profileSheet} onClose={() => setProfileSheet(null)} />}
           </AnimatePresence>
           <AnimatePresence>
+            {showCapture && (
+              <CaptureSheet
+                petName={activePet.name}
+                onClose={() => setShowCapture(false)}
+                onAction={handleCapture}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
             {showAccount && (
               <AccountSheet
                 onClose={() => setShowAccount(false)}
                 onOpenPaywall={() => { setShowAccount(false); openPaywall(); }}
-                onOpenReferral={() => { setShowAccount(false); push("referral" as SubScreenId); }}
-                onOpenTerms={() => { setShowAccount(false); push("terms" as SubScreenId); }}
-                onOpenPrivacy={() => { setShowAccount(false); push("privacy" as SubScreenId); }}
+                onOpenReferral={() => { setShowAccount(false); push("referral"); }}
+                onOpenTerms={() => { setShowAccount(false); push("terms"); }}
+                onOpenPrivacy={() => { setShowAccount(false); push("privacy"); }}
               />
             )}
           </AnimatePresence>
 
-          {!subScreen && <BottomNav activeTab={tab} setTab={(t) => { reset(); setTab(t); }} />}
+          {!subScreen && (
+            <BottomNav
+              activeTab={tab}
+              setTab={handleSetTab}
+              onCapture={() => setShowCapture(true)}
+            />
+          )}
         </>
       )}
     </div>
