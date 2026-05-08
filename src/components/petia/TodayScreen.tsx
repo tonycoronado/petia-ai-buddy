@@ -206,20 +206,23 @@ const TodayScreen = ({
         </>
       )}
 
-      {/* FOR YOU — small low-contrast suggestion chips */}
+      {/* FOR YOU — actionable rows */}
       <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 mt-3 px-1">
         For you
       </p>
-      <div className="space-y-2 mb-6">
-        <SuggestionChip
+      <div className="space-y-3 mb-6">
+        <SuggestionRow
           icon={Scale}
-          label={`Log ${activePet.name}'s weight — 18 days since last entry`}
+          title={`Log ${activePet.name}'s weight`}
+          hint="18 days since last entry"
           onClick={onOpenWeight}
         />
-        <SuggestionChip
+        <SuggestionRow
           icon={Sparkles}
-          label={isPremium ? "Your weekly insight is ready" : "Unlock weekly insights"}
+          title="Weekly insights"
+          hint={isPremium ? "New summary ready" : "Mood, food & health patterns"}
           onClick={isPremium ? onOpenInsights : onUpgrade}
+          premium={!isPremium}
         />
       </div>
 
@@ -227,18 +230,18 @@ const TodayScreen = ({
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={handleEmergency}
-        className="w-full glass rounded-3xl p-4 shadow-soft flex items-center gap-3"
+        className="w-full rounded-3xl p-4 shadow-glow flex items-center gap-3 bg-destructive text-destructive-foreground"
       >
-        <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground/70 shrink-0">
+        <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-destructive-foreground shrink-0">
           <Siren size={18} />
         </div>
         <div className="flex-1 text-left">
-          <p className="font-black text-foreground text-sm">Emergency vet</p>
-          <p className="text-[11px] text-muted-foreground font-medium">
+          <p className="font-black text-sm">Emergency vet</p>
+          <p className="text-[11px] font-medium opacity-90">
             Find the nearest 24/7 clinic
           </p>
         </div>
-        <ChevronRight size={16} className="text-muted-foreground" />
+        <ChevronRight size={16} className="opacity-90" />
       </motion.button>
     </motion.div>
   );
@@ -329,24 +332,40 @@ const Hero = ({
   );
 };
 
-const SuggestionChip = ({
+const SuggestionRow = ({
   icon: Icon,
-  label,
+  title,
+  hint,
   onClick,
+  premium,
 }: {
   icon: any;
-  label: string;
+  title: string;
+  hint: string;
   onClick: () => void;
+  premium?: boolean;
 }) => (
-  <button
+  <motion.button
+    whileTap={{ scale: 0.97 }}
     onClick={onClick}
-    className="w-full rounded-3xl p-3 bg-muted/60 flex items-center gap-3 text-left"
+    className="w-full glass rounded-4xl p-5 shadow-soft flex items-center gap-4 text-left"
   >
-    <div className="w-8 h-8 rounded-2xl bg-background/70 flex items-center justify-center text-foreground/70 shrink-0">
-      <Icon size={14} />
+    <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center text-foreground shrink-0">
+      <Icon size={20} />
     </div>
-    <p className="text-xs text-foreground/80 font-medium flex-1">{label}</p>
-  </button>
+    <div className="flex-1 min-w-0">
+      <p className="font-black text-foreground text-sm flex items-center gap-1.5">
+        {title}
+        {premium && (
+          <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">
+            Premium
+          </span>
+        )}
+      </p>
+      <p className="text-[11px] text-muted-foreground font-medium truncate">{hint}</p>
+    </div>
+    <ChevronRight size={16} className="text-muted-foreground" />
+  </motion.button>
 );
 
 export default TodayScreen;
