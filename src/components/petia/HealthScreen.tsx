@@ -31,10 +31,20 @@ interface HealthScreenProps {
   onUpgrade: () => void;
 }
 
-// Mock recent activity preview
-const RECENT = [
+type RecentCategory = "Health" | "Vet" | "Weight" | "Mood";
+const RECENT: Array<{
+  id: string;
+  category: RecentCategory;
+  label: string;
+  title: string;
+  date: string;
+  status: string;
+  tone: string;
+  thumb: string;
+}> = [
   {
     id: "r1",
+    category: "Health",
     label: "Skin",
     title: "Redness behind left ear",
     date: "Apr 6",
@@ -44,12 +54,33 @@ const RECENT = [
   },
   {
     id: "r2",
+    category: "Vet",
     label: "Vet visit",
     title: "Itchy ears check-up",
     date: "Mar 22",
     status: "Resolved",
     tone: "bg-emerald-100 text-emerald-700",
     thumb: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=160",
+  },
+  {
+    id: "r3",
+    category: "Weight",
+    label: "Weight",
+    title: "Logged 12.4 kg",
+    date: "Apr 2",
+    status: "On track",
+    tone: "bg-secondary text-foreground",
+    thumb: "https://images.unsplash.com/photo-1558944351-c2c0e9bbb15c?auto=format&fit=crop&q=80&w=160",
+  },
+  {
+    id: "r4",
+    category: "Mood",
+    label: "Mood",
+    title: "Happy and energetic",
+    date: "Apr 1",
+    status: "Happy",
+    tone: "bg-primary/15 text-primary",
+    thumb: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=160",
   },
 ];
 
