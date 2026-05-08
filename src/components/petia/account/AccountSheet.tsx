@@ -172,7 +172,8 @@ const AccountSheet = ({
           <Row
             icon={Sparkles}
             label="AI features"
-            sub="Powered by Anthropic — no training on your data"
+            sub={aiEnabled ? "AI features enabled · View disclosure" : "AI features off · View disclosure"}
+            onClick={() => toast.message("Petia uses Anthropic, Google and OpenAI for different AI features. Photos and data are never used to train models.")}
             right={<Switch checked={aiEnabled} onCheckedChange={setAiEnabled} />}
           />
         </div>

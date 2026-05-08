@@ -82,7 +82,7 @@ const SmartCaptureScreen = ({
   // Rotate analyzing hints
   useEffect(() => {
     if (phase !== "analyzing") return;
-    const t = setInterval(() => setHintIdx((i) => (i + 1) % ANALYZING_HINTS.length), 500);
+    const t = setInterval(() => setHintIdx((i) => (i + 1) % ANALYZING_HINTS.length), 1500);
     return () => clearInterval(t);
   }, [phase]);
 
@@ -119,7 +119,7 @@ const SmartCaptureScreen = ({
         setPhase("result");
         triggerHaptic("success");
       }
-    }, 1400);
+    }, 6000);
   };
 
   const onFile = (f: File | undefined) => {
@@ -255,13 +255,15 @@ const SmartCaptureScreen = ({
             exit={{ opacity: 0 }}
           >
             <div className="glass rounded-5xl p-8 shadow-soft mb-6 flex flex-col items-center">
-              <div className="w-40 h-40 rounded-full gradient-accent p-1 shadow-glow mb-6">
-                <div className="w-full h-full rounded-full glass-dark flex flex-col items-center justify-center text-primary-foreground">
-                  <Camera size={40} strokeWidth={1.5} className="mb-2" />
-                  <span className="font-bold uppercase tracking-[0.2em] text-[10px]">
-                    Take a photo
-                  </span>
+              <div className="relative w-40 h-40 rounded-full gradient-accent p-1 shadow-glow mb-6" aria-hidden>
+                <div className="w-full h-full rounded-full glass-dark flex items-center justify-center text-primary-foreground">
+                  <Camera size={44} strokeWidth={1.5} />
                 </div>
+                {/* viewfinder corner frame */}
+                <span className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-primary-foreground/70 rounded-tl-lg" />
+                <span className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-primary-foreground/70 rounded-tr-lg" />
+                <span className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-primary-foreground/70 rounded-bl-lg" />
+                <span className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-primary-foreground/70 rounded-br-lg" />
               </div>
               <p className="text-center text-muted-foreground text-sm font-medium max-w-[260px] mb-6">
                 Show Petia anything — food, a concern, or a vet paper.

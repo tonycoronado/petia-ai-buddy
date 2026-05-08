@@ -1,121 +1,58 @@
-## Petia Mobile UX Refinement — v2 (approved)
+Polish pass on the approved Petia mobile IA. No new features, no brand changes, no removed features.
 
-Branding, colors, typography, spacing, glass cards, gradients, icons, and tone stay untouched. Mobile-only. No new features, no removed major features.
+## 1. Today subline (TodayScreen.tsx)
+Replace count-style sublines with hero-priority phrasing:
+- overdue → "Start with what's overdue."
+- due → "Top priority for {pet} today."
+- followup → "One health item to re-check."
+- clear → "{pet} is all set." (unchanged)
 
----
+## 2. Smart Capture — single primary CTA (SmartCaptureScreen.tsx, `pick` phase)
+Make the big circle a viewfinder visual anchor, not a button:
+- Convert the 40 px Camera circle to a non-interactive `<div>` (no tap handler, no "Take a photo" copy inside it). Keep the gradient ring + glass interior; show only the camera glyph + a faint dashed corner-frame to read as a viewfinder.
+- Keep the single primary `Take photo` gradient button below as the only photo CTA.
+- Keep the secondary `Upload from library` text link.
 
-### 1. Today — prioritized hierarchy
+## 3. Sample thumbnails (mockClassifier.ts)
+Swap the two misleading Unsplash URLs for clearer ones:
+- Food label → kibble bag / pet food packaging shot.
+- Health concern → close-up that visibly reads as a concern (e.g. paw/skin/ear close-up), not a happy portrait.
+- Vet document → keep as-is.
+Use stable Unsplash photo IDs only; no new assets.
 
-- **Hero zone** (top, large): active pet header + the single most important item. Priority order: overdue reminder → due-today reminder → open health follow-up → calm "all clear" hero.
-- "All clear" hero copy: **"Nothing urgent today"** (no emoji — keeps premium tone).
-- **Daily mood** card (medium weight, quick tap, single screen).
-- **Needs attention** (compact rows, only renders when more attention items exist beyond the hero).
-- **For you** (small low-contrast suggestion chips: weekly insight teaser, "log weight (18 days)", etc.).
-- Subline tied to hero state, not a misleading counter.
-- **Emergency Vet** pinned at the bottom of Today as a calm safety action. Lives only here.
+## 4. Care helpers grouping (CareScreen.tsx)
+- Section label becomes `Petia helpers · Premium` (single inline pill on the right of the label is fine).
+- Remove the per-row `Lock` icon and the `locked` prop usage in the helper rows.
+- Keep the single shared `Unlock Petia helpers` CTA at the bottom.
+- Behavior unchanged: tapping a helper while non-premium still routes to `onUpgrade`.
 
-### 2. Mood labels
+## 5. AI disclosure copy (AccountSheet.tsx)
+Replace `Powered by Anthropic — no training on your data` with neutral copy:
+- Sub: `AI features enabled · View disclosure` when `aiEnabled`, otherwise `AI features off · View disclosure`.
+- Tapping the row label area opens a short toast/info: "Petia uses Anthropic, Google and OpenAI for different AI features. Photos and data are never used to train models."
+- Switch behavior unchanged.
 
-Rename `Low` → `Lethargic`. Final 5: Energetic, Happy, Normal, Quiet, Lethargic. Audit other references.
+## 6. Emergency Vet — calmer safety affordance (TodayScreen.tsx only)
+- Keep it only on Today (already removed elsewhere).
+- Restyle the footer card so it reads as safety, not alert: neutral glass surface, small `Siren` glyph in a soft `bg-muted` circle (not destructive red fill), label `Emergency vet`, sub `Find the nearest 24/7 clinic`, with a subtle right-aligned `ChevronRight`. Drop the `border-destructive/20` and the destructive icon background.
 
-### 3. Smart Capture — staged intelligent flow
+## 7. Capture nav active state (BottomNav.tsx)
+- Remove `ring-4 ring-primary/30` (reads as a harsh outline).
+- When `activeTab === "capture"`, indicate active state with the existing teal language only: a slightly stronger `shadow-glow` (already present) plus `scale-105` on the gradient button. No ring, no border.
+- Keep focus-visible ring for keyboard a11y via Tailwind defaults (no custom outline).
 
-States, in order:
+## 8. Realistic analysis pause (SmartCaptureScreen.tsx)
+- Bump `setTimeout` in `startAnalyze` from 1400 ms to 6000 ms.
+- Slow the hint rotator: change interval from 500 ms to ~1500 ms so the 3 hints cycle smoothly across ~6 s without flicker.
+- Keep the `Understanding photo…` heading, spinner, and thumbnail; no copy redesign.
 
-```text
-[ AI consent gate? ] -> [ Ready ] -> [ Preview ] -> [ Understanding photo... ]
-   -> [ Classified: Food / Health / Vet document ] -> result
-   (Uncertain -> 3-tile chooser)
-```
+## Out of scope
+No changes to Health, ImportVetRecords, mock data shape, routing, or any business logic. No new screens or features.
 
-- **AI consent gate (short, calm)**: if `appSettings.aiConsent` is false or AI disabled, Capture renders one warm card: short line on what Petia analyzes, primary "Enable AI", secondary "Not now", tertiary "View AI disclosure" link to Account → AI consent. No legal wall of text, no camera until enabled.
-- Capture stays AI-first in this prototype: consent before camera is acceptable.
-- **Ready**: viewfinder card, primary "Take photo" + secondary "Upload from library". Reassurance line: "Show Petia anything — food, a concern, a vet paper."
-- **Preview**: photo fills frame, "Retake" / "Use this photo".
-- **Analyzing**: shimmer + "Understanding photo..." with rotating hints (~1.4s mock).
-- **Classified**: glass card with detected type pill, confidence dot, "Continue" CTA, and "Not this? Change type ▾" chip exposing other kinds.
-- **Uncertain**: 3-tile chooser only (Food / Health concern / Vet document).
-- **Premium gates after classification**, at the natural locked moment:
-  - Food classified → if monthly food-scan limit reached → paywall.
-  - Health classified → if diary/triage limit reached → paywall.
-  - Vet doc classified → if OCR-import limit reached → paywall.
-  - Capture itself is never blocked early.
-- Smart Capture is the only primary photo entry point app-wide.
-
-### 4. Health follow-up via Capture (preserved)
-
-- From a diary entry detail and from the Today follow-up card, "Add follow-up" routes into Smart Capture **with context** (`followUpFor: entryId`).
-- Capture pre-tags the resulting health entry as a follow-up of the original so side-by-side comparison still works.
-- No camera opens directly inside Health.
-
-### 5. Remove duplicate photo CTAs
-
-- `HealthScreen.tsx`: remove the "Add an observation" gradient camera card. Replace with a small inline secondary link: "Add via Smart Capture →" that switches to the Capture tab.
-- Audit `FoodScannerScreen`, `HealthDiaryScreen`, `ImportVetRecordsScreen`: no standalone camera entry — they're only reachable as Capture results or as read-only history rows.
-
-### 6. Health — history & context only
-
-- Title sublabel: "{Pet}'s health history".
-- Compact "Recent activity" preview (last 2–3 diary/vet entries with thumbnails + status pill: Monitoring / Improving / Resolved).
-- Stat strip retained (Weight / Last vet / Records).
-- Sections: Photo journal, Weight, Vet visits, **Medical records** (see §7).
-- Footer: Export health PDF (premium gate).
-- Single secondary "Add via Smart Capture →" link.
-- No Emergency Vet here.
-
-### 7. Medical Records — records library
-
-- "Medical records" routes to a records **library** view (built on the existing `ImportVetRecordsScreen` saved-records list): list of saved records (vaccines, prescriptions, labs, invoices, certificates) with thumbnail, type badge, date, search/filter, detail/edit/delete.
-- "Import from photo" / OCR is a **secondary action inside the library** (top-right or empty-state CTA) that routes through Smart Capture → Vet document branch.
-- Capture's vet-doc result still funnels saved records into this library.
-
-### 8. Care — useful for free, helpers as premium
-
-Two clearly separated groups:
-
-- **Routines (free, top)** — primary visual weight, with a useful free primary action at the very top so the tab never feels passive or premium-only:
-  - Hero "Add reminder" / "Review today's care" CTA.
-  - Reminders card (overdue/due counts).
-  - Routine tasks summary (birthdays, recurring grooming).
-- **Petia helpers (premium)** — secondary, smaller cards, soft lock badge (no full blur):
-  - AI smart suggestions, AI care chat, Weekly insights, Expenses.
-  - One shared "Unlock helpers" CTA at the bottom of the helpers group.
-- Emergency Vet removed from Care.
-
-### 9. Smart Capture samples (teaching aid only)
-
-In `mockClassifier.ts` and Capture UI:
-- Keep exactly 3 samples: Food label, Health concern, Vet document. Drop "Unclear".
-- Render samples as a small, secondary "Try a sample" row at the bottom of the Ready state — never primary.
-- Fix vet-doc thumbnail to a reliable source (or local SVG matching brand) so it always renders.
-- Tapping a sample seeds the classifier with the matching `kind` and jumps Capture into Analyzing → Classified, bypassing the camera.
-
-### 10. Emergency Vet placement
-
-Only on Today (footer safety action). Confirm absent from Health, Care, Capture, Account.
-
-### 11. Visual hierarchy rules
-
-Three weights used consistently across Today, Health, Care:
-- **Hero card**: full-width, gradient/shadow-glow, primary CTA inline.
-- **Standard row**: glass card, icon tile, title + hint, chevron.
-- **Suggestion chip**: compact, lower contrast, no chevron.
-
-### 12. Mobile-only
-
-No desktop/tablet layout work. Set preview viewport to mobile.
-
----
-
-### Files touched
-
-- `src/components/petia/TodayScreen.tsx` — hierarchy zones, mood label fix, calm hero copy, Emergency Vet footer.
-- `src/components/petia/SmartCaptureScreen.tsx` — staged flow + short calm AI-consent gate + post-classification premium gates + follow-up context handling + secondary samples row.
-- `src/lib/mockClassifier.ts` — 3 samples only, fixed vet-doc thumb, sample-seeding helper.
-- `src/components/petia/HealthScreen.tsx` — remove camera CTA, add Recent activity, route Medical records to library, "Add via Smart Capture" secondary link, follow-up CTA wired with context.
-- `src/components/petia/ImportVetRecordsScreen.tsx` — reframe as Medical records library; OCR/import as a secondary action inside it.
-- `src/components/petia/CareScreen.tsx` — Routines group with free primary action on top, Helpers group with single unlock CTA, remove Emergency Vet.
-- `src/pages/Index.tsx` — wire follow-up context param into Capture, route Medical records to the library view.
-- Light read of `src/lib/appSettings.tsx` to use existing `aiConsent`/premium flags (no schema change).
-
-No brand changes, no business logic changes beyond presentation and gating placement.
+## Files touched
+- src/components/petia/TodayScreen.tsx
+- src/components/petia/SmartCaptureScreen.tsx
+- src/components/petia/CareScreen.tsx
+- src/components/petia/BottomNav.tsx
+- src/components/petia/account/AccountSheet.tsx
+- src/lib/mockClassifier.ts
