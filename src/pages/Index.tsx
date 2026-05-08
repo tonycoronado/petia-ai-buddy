@@ -143,7 +143,7 @@ const Inner = () => {
       {showSplash && splashExit && <SplashExiter onDone={() => setShowSplash(false)} />}
 
       <AnimatePresence>
-        {!showSplash && !hasOnboarded && !showTrialOffer && (
+        {!showSplash && !hasOnboarded && (
           <OnboardingWizard onComplete={handleOnboardingComplete} />
         )}
       </AnimatePresence>
