@@ -166,10 +166,7 @@ const Row = ({
       <Icon size={20} />
     </div>
     <div className="flex-1 min-w-0">
-      <p className="font-black text-foreground text-sm flex items-center gap-1.5">
-        {title}
-        {locked && <Lock size={11} className="text-muted-foreground" />}
-      </p>
+      <p className="font-black text-foreground text-sm">{title}</p>
       <p className="text-[11px] text-muted-foreground font-medium truncate">{hint}</p>
     </div>
     <ChevronRight size={16} className="text-muted-foreground" />
