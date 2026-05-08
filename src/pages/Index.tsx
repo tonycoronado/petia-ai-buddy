@@ -206,6 +206,7 @@ const Inner = () => {
                 onOpenReminders={() => push("reminders")}
                 onOpenInsights={() => push("insights")}
                 onOpenChat={() => push("chat")}
+                onOpenWeight={() => push("weight")}
                 onUpgrade={openPaywall}
               />
             )}
