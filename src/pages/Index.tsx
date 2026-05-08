@@ -66,6 +66,7 @@ const Inner = () => {
   const [splashExit, setSplashExit] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [showTrialOffer, setShowTrialOffer] = useState(false);
+  const [trialOfferShown, setTrialOfferShown] = useState(false);
   const [onboardedName, setOnboardedName] = useState<string>("your pet");
   const [tab, setTab] = useState("today");
   const { current: subScreen, push, pop, reset } = useScreenStack<SubScreenId>();
@@ -80,12 +81,19 @@ const Inner = () => {
       img: data.photoUrl || prev.img,
       weight: data.weightValue ? `${data.weightValue.toFixed(1)}kg` : prev.weight,
     }));
-    setShowTrialOffer(true);
+    // Defer trial offer — don't show it before user feels Petia's value
+    setHasOnboarded(true);
   };
 
   const finishOnboarding = () => {
     setShowTrialOffer(false);
-    setHasOnboarded(true);
+    setTrialOfferShown(true);
+  };
+
+  const triggerDeferredTrialOffer = () => {
+    if (trialOfferShown) return;
+    setTrialOfferShown(true);
+    setTimeout(() => setShowTrialOffer(true), 800);
   };
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
