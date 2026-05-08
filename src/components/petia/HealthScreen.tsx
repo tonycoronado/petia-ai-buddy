@@ -97,6 +97,11 @@ const HealthScreen = ({
 }: HealthScreenProps) => {
   const { isPremium } = useAppSettings();
   const petId = String(activePet.id);
+  const [filter, setFilter] = useState<"All" | RecentCategory>("All");
+  const filteredRecent = useMemo(
+    () => (filter === "All" ? RECENT : RECENT.filter((r) => r.category === filter)),
+    [filter],
+  );
 
   const lastVet = MOCK_VET_VISITS.find((v) => v.petId === petId);
   const weights = MOCK_WEIGHT[petId] ?? [];
