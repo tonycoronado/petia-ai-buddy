@@ -173,6 +173,7 @@ const Inner = () => {
             {subScreen === "reminders" && <RemindersScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "vet" && <VetVisitsScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
             {subScreen === "import" && <ImportVetRecordsScreen petName={activePet.name} mode="profile" onBack={() => pop()} onSkip={() => pop()} onComplete={() => pop()} />}
+            {subScreen === "records" && <ImportVetRecordsScreen petName={activePet.name} mode="library" onBack={() => pop()} onSkip={() => pop()} onComplete={() => pop()} onAddViaCapture={() => { pop(); goToCapture(); }} />}
             {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}
