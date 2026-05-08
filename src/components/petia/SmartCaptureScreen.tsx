@@ -65,6 +65,7 @@ const SmartCaptureScreen = ({
   onUpgrade,
   followUpFor,
   onClearFollowUp,
+  onFirstAiResult,
 }: SmartCaptureScreenProps) => {
   const { aiEnabled, setAiEnabled, isPremium } = useAppSettings();
   const [phase, setPhase] = useState<Phase>(aiEnabled ? "pick" : "consent");
