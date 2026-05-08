@@ -22,19 +22,22 @@ export function classifyCapture(forced?: CaptureKind): {
   return { kind: k, confidence: k === "uncertain" ? 0.42 : 0.91 };
 }
 
+import sampleFoodLabel from "@/assets/sample-food-label.jpg";
+import sampleHealthConcern from "@/assets/sample-health-concern.jpg";
+
 // Teaching-only demo samples. Exactly 3 — Food label, Health concern, Vet document.
 export const SAMPLE_CAPTURES: { id: string; label: string; kind: Exclude<CaptureKind, "uncertain">; thumb: string }[] = [
   {
     id: "smp-food",
     label: "Food label",
     kind: "food",
-    thumb: "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?auto=format&fit=crop&q=80&w=200",
+    thumb: sampleFoodLabel,
   },
   {
     id: "smp-health",
     label: "Health concern",
     kind: "health",
-    thumb: "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&q=80&w=200",
+    thumb: sampleHealthConcern,
   },
   {
     id: "smp-doc",
