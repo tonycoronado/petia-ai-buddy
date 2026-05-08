@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
-import HomeScreen from "@/components/petia/HomeScreen";
+import TodayScreen from "@/components/petia/TodayScreen";
+import HealthScreen from "@/components/petia/HealthScreen";
+import CareScreen from "@/components/petia/CareScreen";
+import SmartCaptureScreen from "@/components/petia/SmartCaptureScreen";
 import FoodScannerScreen from "@/components/petia/FoodScannerScreen";
 import HealthDiaryScreen from "@/components/petia/HealthDiaryScreen";
 import ChatScreen from "@/components/petia/ChatScreen";
-import PetHubScreen from "@/components/petia/pet/PetHubScreen";
 import PetProfileSheet from "@/components/petia/PetProfileSheet";
 import PaywallScreen from "@/components/petia/PaywallScreen";
 import ImportVetRecordsScreen from "@/components/petia/ImportVetRecordsScreen";
@@ -18,8 +20,8 @@ import AccountSheet from "@/components/petia/account/AccountSheet";
 import ReferralScreen from "@/components/petia/account/ReferralScreen";
 import LegalScreen from "@/components/petia/account/LegalScreen";
 import BottomNav from "@/components/petia/BottomNav";
-import CaptureSheet, { type CaptureAction } from "@/components/petia/CaptureSheet";
 import SplashScreen from "@/components/petia/SplashScreen";
+import PetSwitcherSheet from "@/components/petia/PetSwitcherSheet";
 import type { Pet } from "@/components/petia/FloatingBubble";
 import { MOCK_PETS } from "@/lib/mockData";
 import { AppSettingsProvider } from "@/lib/appSettings";
@@ -36,6 +38,7 @@ type SubScreenId =
   | "pdf"
   | "scanner"
   | "diary"
+  | "chat"
   | "referral"
   | "terms"
   | "privacy";
@@ -58,13 +61,13 @@ const PRIVACY = [
 const Inner = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [splashExit, setSplashExit] = useState(false);
-  const [tab, setTab] = useState("home");
+  const [tab, setTab] = useState("today");
   const { current: subScreen, push, pop, reset } = useScreenStack<SubScreenId>();
   const [activePet, setActivePet] = useState<Pet>(MOCK_PETS[0]);
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
-  const [showCapture, setShowCapture] = useState(false);
+  const [showSwitcher, setShowSwitcher] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setSplashExit(true), 2000);
@@ -74,51 +77,25 @@ const Inner = () => {
   const openPaywall = () => setShowPaywall(true);
 
   const handleSwitchPet = (pet: Pet) => {
-    if (String(pet.id) === String(activePet.id)) return;
-    setActivePet(pet);
-    toast.success(`${pet.name} is now active`);
-  };
-
-  const handleAccountTab = () => {
-    setShowAccount(true);
-  };
-
-  const handleCapture = (action: CaptureAction) => {
-    setShowCapture(false);
-    switch (action) {
-      case "scan":
-        push("scanner");
-        break;
-      case "mood":
-        if (tab !== "home") setTab("home");
-        toast.success(`Tap a mood for ${activePet.name}`);
-        break;
-      case "diary":
-        push("diary");
-        break;
-      case "weight":
-        push("weight");
-        break;
-      case "reminder":
-        push("reminders");
-        break;
-      case "vet":
-        push("vet");
-        break;
-      case "import":
-        push("import");
-        break;
+    if (String(pet.id) === String(activePet.id)) {
+      setShowSwitcher(false);
+      return;
     }
+    setActivePet(pet);
+    setShowSwitcher(false);
+    toast.success(`${pet.name} is now active`);
   };
 
   const handleSetTab = (t: string) => {
     if (t === "account") {
-      handleAccountTab();
+      setShowAccount(true);
       return;
     }
     reset();
     setTab(t);
   };
+
+  const tapPet = () => setShowSwitcher(true);
 
   return (
     <div className="bg-background text-foreground font-sans min-h-screen max-w-md mx-auto relative overflow-hidden shadow-2xl">
@@ -130,38 +107,48 @@ const Inner = () => {
       {!showSplash && (
         <>
           <AnimatePresence mode="wait">
-            {!subScreen && tab === "home" && (
-              <HomeScreen
-                pets={MOCK_PETS}
+            {!subScreen && tab === "today" && (
+              <TodayScreen
                 activePet={activePet}
-                onSwitchPet={handleSwitchPet}
-                onLongPressPet={(p) => setProfileSheet(p)}
-                onOpenAccount={() => setShowAccount(true)}
-                onOpenMoodHistory={() => push("mood")}
+                onTapPet={tapPet}
                 onOpenReminders={() => push("reminders")}
                 onOpenInsights={() => push("insights")}
-                onOpenScanner={() => push("scanner")}
                 onOpenDiary={() => push("diary")}
+                onOpenWeight={() => push("weight")}
+                onOpenMoodHistory={() => push("mood")}
+                onUpgrade={openPaywall}
+              />
+            )}
+            {!subScreen && tab === "health" && (
+              <HealthScreen
+                activePet={activePet}
+                onTapPet={tapPet}
+                onOpenDiary={() => push("diary")}
+                onOpenWeight={() => push("weight")}
+                onOpenVet={() => push("vet")}
+                onOpenPDF={() => push("pdf")}
+                onUpgrade={openPaywall}
+              />
+            )}
+            {!subScreen && tab === "capture" && (
+              <SmartCaptureScreen
+                activePet={activePet}
+                onTapPet={tapPet}
+                onOpenFullScanner={() => push("scanner")}
+                onOpenFullDiary={() => push("diary")}
+                onOpenFullImport={() => push("import")}
               />
             )}
             {!subScreen && tab === "care" && (
-              <PetHubScreen
-                pets={MOCK_PETS}
+              <CareScreen
                 activePet={activePet}
-                onSwitchPet={handleSwitchPet}
-                onLongPressPet={(p) => setProfileSheet(p)}
-                onAddPet={openPaywall}
+                onTapPet={tapPet}
                 onOpenReminders={() => push("reminders")}
-                onOpenWeight={() => push("weight")}
-                onOpenVet={() => push("vet")}
-                onOpenDiary={() => push("diary")}
-                onOpenImport={() => push("import")}
                 onOpenInsights={() => push("insights")}
-                onOpenPDF={() => push("pdf")}
-                onOpenMoodHistory={() => push("mood")}
+                onOpenChat={() => push("chat")}
+                onUpgrade={openPaywall}
               />
             )}
-            {!subScreen && tab === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}
 
             {subScreen === "scanner" && (
               <FoodScannerScreen petName={activePet.name} onUpgrade={openPaywall} onBack={() => pop()} />
@@ -174,6 +161,7 @@ const Inner = () => {
             {subScreen === "import" && <ImportVetRecordsScreen petName={activePet.name} mode="profile" onBack={() => pop()} onSkip={() => pop()} onComplete={() => pop()} />}
             {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
+            {subScreen === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}
             {subScreen === "referral" && <ReferralScreen onBack={() => pop()} />}
             {subScreen === "terms" && <LegalScreen title="Terms of Service" body={TERMS} onBack={() => pop()} />}
             {subScreen === "privacy" && <LegalScreen title="Privacy Policy" body={PRIVACY} onBack={() => pop()} />}
@@ -186,11 +174,14 @@ const Inner = () => {
             {profileSheet && <PetProfileSheet pet={profileSheet} onClose={() => setProfileSheet(null)} />}
           </AnimatePresence>
           <AnimatePresence>
-            {showCapture && (
-              <CaptureSheet
-                petName={activePet.name}
-                onClose={() => setShowCapture(false)}
-                onAction={handleCapture}
+            {showSwitcher && (
+              <PetSwitcherSheet
+                pets={MOCK_PETS}
+                activePetId={String(activePet.id)}
+                onSelect={handleSwitchPet}
+                onLongPress={(p) => { setShowSwitcher(false); setProfileSheet(p); }}
+                onAddPet={() => { setShowSwitcher(false); openPaywall(); }}
+                onClose={() => setShowSwitcher(false)}
               />
             )}
           </AnimatePresence>
@@ -206,13 +197,7 @@ const Inner = () => {
             )}
           </AnimatePresence>
 
-          {!subScreen && (
-            <BottomNav
-              activeTab={tab}
-              setTab={handleSetTab}
-              onCapture={() => setShowCapture(true)}
-            />
-          )}
+          {!subScreen && <BottomNav activeTab={tab} setTab={handleSetTab} />}
         </>
       )}
     </div>
