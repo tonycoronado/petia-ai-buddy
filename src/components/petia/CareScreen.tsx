@@ -5,9 +5,9 @@ import {
   MessageCircle,
   Wallet,
   ChevronRight,
-  Lock,
   Plus,
   CalendarCheck,
+  Scale,
 } from "lucide-react";
 import { MOCK_REMINDERS } from "@/lib/mockData";
 import { useAppSettings } from "@/lib/appSettings";
@@ -21,6 +21,7 @@ interface CareScreenProps {
   onOpenReminders: () => void;
   onOpenInsights: () => void;
   onOpenChat: () => void;
+  onOpenWeight?: () => void;
   onUpgrade: () => void;
 }
 
@@ -30,6 +31,7 @@ const CareScreen = ({
   onOpenReminders,
   onOpenInsights,
   onOpenChat,
+  onOpenWeight,
   onUpgrade,
 }: CareScreenProps) => {
   const { isPremium } = useAppSettings();
