@@ -49,7 +49,7 @@ const RemindersScreen = ({ petId, petName, onBack, onUpgrade }: RemindersScreenP
     if (!newTitle.trim()) return;
     if (!isPremium && activeCount >= FREE_LIMIT) {
       toast.error("Free plan limited to 3 active reminders");
-      onUpgrade();
+      onUpgrade(`You're adding reminder #${activeCount + 1} for ${petName} — unlock unlimited reminders with Petia PRO.`);
       return;
     }
     setItems([
