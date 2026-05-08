@@ -234,7 +234,7 @@ const Inner = () => {
           </AnimatePresence>
 
           <AnimatePresence>
-            {showPaywall && <PaywallScreen onClose={() => setShowPaywall(false)} />}
+            {showPaywall && <PaywallScreen onClose={() => { setShowPaywall(false); setPaywallReason(undefined); }} reason={paywallReason} />}
           </AnimatePresence>
           <AnimatePresence>
             {profileSheet && <PetProfileSheet pet={profileSheet} onClose={() => setProfileSheet(null)} />}
