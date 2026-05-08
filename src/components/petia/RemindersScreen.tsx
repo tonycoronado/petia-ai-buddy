@@ -12,7 +12,7 @@ interface RemindersScreenProps {
   petId: string;
   petName: string;
   onBack: () => void;
-  onUpgrade: () => void;
+  onUpgrade: (reason?: string) => void;
 }
 
 const CATEGORIES: ReminderCategory[] = ["Vaccination", "Medication", "Deworming", "Grooming", "Vet Visit", "General"];
