@@ -62,8 +62,8 @@ const BottomNav = ({ activeTab, setTab }: BottomNavProps) => (
     <button
       onClick={() => setTab("capture")}
       aria-label="Smart Capture"
-      className={`w-16 h-16 rounded-full gradient-cta text-primary-foreground shadow-glow flex flex-col items-center justify-center -mt-8 active:scale-95 transition-transform ${
-        activeTab === "capture" ? "ring-4 ring-primary/30" : ""
+      className={`w-16 h-16 rounded-full gradient-cta text-primary-foreground shadow-glow flex flex-col items-center justify-center -mt-8 transition-transform ${
+        activeTab === "capture" ? "scale-105" : "active:scale-95"
       }`}
     >
       <Camera size={24} strokeWidth={2.5} />

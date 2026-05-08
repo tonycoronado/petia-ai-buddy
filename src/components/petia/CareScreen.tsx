@@ -91,37 +91,40 @@ const CareScreen = ({
       </div>
 
       {/* HELPERS — premium */}
-      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 px-1">
-        Petia helpers
-      </p>
+      <div className="flex items-center justify-between mb-2 px-1">
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+          Petia helpers
+        </p>
+        {!isPremium && (
+          <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+            Premium
+          </span>
+        )}
+      </div>
       <div className="space-y-3 mb-4">
         <Row
           icon={Sparkles}
           title="AI smart suggestions"
           hint={isPremium ? `3 personalized for ${activePet.name}` : "Personalized reminder ideas"}
           onClick={isPremium ? onOpenReminders : onUpgrade}
-          locked={!isPremium}
         />
         <Row
           icon={MessageCircle}
           title="AI care chat"
           hint={isPremium ? `Ask about ${activePet.name}` : "Quick answers about your pet"}
           onClick={isPremium ? onOpenChat : onUpgrade}
-          locked={!isPremium}
         />
         <Row
           icon={Sparkles}
           title="Weekly insights"
           hint={isPremium ? "New summary ready" : "Mood, food & health patterns"}
           onClick={isPremium ? onOpenInsights : onUpgrade}
-          locked={!isPremium}
         />
         <Row
           icon={Wallet}
           title="Expenses"
           hint={isPremium ? "Track vet, food, supplies" : "Track pet spending"}
           onClick={isPremium ? () => toast.success("Expenses coming soon") : onUpgrade}
-          locked={!isPremium}
         />
       </div>
 
