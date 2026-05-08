@@ -196,8 +196,10 @@ const TodayScreen = ({
           </div>
         ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-3">
-            <p className="font-bold text-foreground text-sm">Mood logged</p>
-            <p className="text-xs text-muted-foreground mt-1">Check back tomorrow.</p>
+            <p className="font-bold text-foreground text-sm">Got it — thanks 🐾</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Petia will check in with {activePet.name} again tomorrow.
+            </p>
           </motion.div>
         )}
       </motion.div>
