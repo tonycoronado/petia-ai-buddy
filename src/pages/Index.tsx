@@ -34,6 +34,7 @@ type SubScreenId =
   | "reminders"
   | "vet"
   | "import"
+  | "records"
   | "insights"
   | "pdf"
   | "scanner"
@@ -68,6 +69,13 @@ const Inner = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showSwitcher, setShowSwitcher] = useState(false);
+  const [followUpFor, setFollowUpFor] = useState<string | null>(null);
+
+  const goToCapture = (followUpId?: string) => {
+    setFollowUpFor(followUpId ?? null);
+    reset();
+    setTab("capture");
+  };
 
   useEffect(() => {
     const t = setTimeout(() => setSplashExit(true), 2000);
@@ -116,6 +124,7 @@ const Inner = () => {
                 onOpenDiary={() => push("diary")}
                 onOpenWeight={() => push("weight")}
                 onOpenMoodHistory={() => push("mood")}
+                onOpenFollowUp={() => goToCapture("d-1")}
                 onUpgrade={openPaywall}
               />
             )}
@@ -126,7 +135,9 @@ const Inner = () => {
                 onOpenDiary={() => push("diary")}
                 onOpenWeight={() => push("weight")}
                 onOpenVet={() => push("vet")}
+                onOpenRecords={() => push("records")}
                 onOpenPDF={() => push("pdf")}
+                onAddViaCapture={() => goToCapture()}
                 onUpgrade={openPaywall}
               />
             )}
@@ -136,7 +147,10 @@ const Inner = () => {
                 onTapPet={tapPet}
                 onOpenFullScanner={() => push("scanner")}
                 onOpenFullDiary={() => push("diary")}
-                onOpenFullImport={() => push("import")}
+                onOpenFullImport={() => push("records")}
+                onUpgrade={openPaywall}
+                followUpFor={followUpFor}
+                onClearFollowUp={() => setFollowUpFor(null)}
               />
             )}
             {!subScreen && tab === "care" && (
@@ -159,6 +173,7 @@ const Inner = () => {
             {subScreen === "reminders" && <RemindersScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "vet" && <VetVisitsScreen petId={String(activePet.id)} petName={activePet.name} onBack={() => pop()} />}
             {subScreen === "import" && <ImportVetRecordsScreen petName={activePet.name} mode="profile" onBack={() => pop()} onSkip={() => pop()} onComplete={() => pop()} />}
+            {subScreen === "records" && <ImportVetRecordsScreen petName={activePet.name} mode="library" onBack={() => pop()} onSkip={() => pop()} onComplete={() => pop()} onAddViaCapture={() => { pop(); goToCapture(); }} />}
             {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}

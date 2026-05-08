@@ -24,16 +24,17 @@ interface Photo {
 
 interface Props {
   petName: string;
-  mode: "onboarding" | "profile";
+  mode: "onboarding" | "profile" | "library";
   onBack?: () => void;
   onSkip: () => void;
   onComplete: (counts: { visits: number; reminders: number }) => void;
+  onAddViaCapture?: () => void;
 }
 
-type Phase = "pick" | "analyzing" | "review" | "empty";
+type Phase = "library" | "pick" | "analyzing" | "review" | "empty";
 
-const ImportVetRecordsScreen = ({ petName, mode, onBack, onSkip, onComplete }: Props) => {
-  const [phase, setPhase] = useState<Phase>("pick");
+const ImportVetRecordsScreen = ({ petName, mode, onBack, onSkip, onComplete, onAddViaCapture }: Props) => {
+  const [phase, setPhase] = useState<Phase>(mode === "library" ? "library" : "pick");
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [result, setResult] = useState<OcrResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -96,12 +97,14 @@ const ImportVetRecordsScreen = ({ petName, mode, onBack, onSkip, onComplete }: P
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          {mode === "profile" && onBack && (
+          {(mode === "profile" || mode === "library") && onBack && (
             <motion.button whileTap={{ scale: 0.9 }} onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-muted">
               <ChevronLeft size={22} className="text-foreground" />
             </motion.button>
           )}
-          <h1 className="text-2xl font-black tracking-tight text-foreground">Import Vet Records</h1>
+          <h1 className="text-2xl font-black tracking-tight text-foreground">
+            {mode === "library" ? "Medical records" : "Import Vet Records"}
+          </h1>
         </div>
         {mode === "onboarding" && phase === "pick" && (
           <button onClick={onSkip} className="text-[11px] font-black text-primary uppercase tracking-widest">
@@ -109,6 +112,105 @@ const ImportVetRecordsScreen = ({ petName, mode, onBack, onSkip, onComplete }: P
           </button>
         )}
       </div>
+
+      {/* LIBRARY — saved records */}
+      {phase === "library" && (
+        <>
+          <p className="text-sm text-muted-foreground font-medium mb-5">
+            {petName}'s saved records — vaccines, prescriptions, labs, invoices.
+          </p>
+
+          <button
+            onClick={onAddViaCapture}
+            className="w-full glass rounded-3xl p-3 shadow-soft flex items-center gap-3 mb-5 border border-primary/15"
+          >
+            <div className="w-10 h-10 rounded-2xl gradient-cta flex items-center justify-center text-primary-foreground shadow-glow">
+              <ImagePlus size={16} />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="font-black text-foreground text-sm">Import from photo</p>
+              <p className="text-[11px] text-muted-foreground font-medium">
+                Routes through Smart Capture
+              </p>
+            </div>
+          </button>
+
+          {MOCK_OCR_RESULT.vaccinations.length > 0 && (
+            <>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 px-1">
+                Vaccinations ({MOCK_OCR_RESULT.vaccinations.length})
+              </p>
+              <div className="space-y-2 mb-5">
+                {MOCK_OCR_RESULT.vaccinations.map((v, i) => (
+                  <div key={i} className="glass rounded-3xl p-4 shadow-soft flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center text-foreground shrink-0">
+                      <Syringe size={16} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-foreground text-sm truncate">{v.name}</p>
+                      <p className="text-[11px] text-muted-foreground font-medium">
+                        Given {v.given}{v.nextDue ? ` · next ${v.nextDue}` : ""}
+                      </p>
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                      Vaccine
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {MOCK_OCR_RESULT.medications.length > 0 && (
+            <>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 px-1">
+                Medications ({MOCK_OCR_RESULT.medications.length})
+              </p>
+              <div className="space-y-2 mb-5">
+                {MOCK_OCR_RESULT.medications.map((m, i) => (
+                  <div key={i} className="glass rounded-3xl p-4 shadow-soft flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center text-foreground shrink-0">
+                      <Pill size={16} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-foreground text-sm truncate">{m.name}</p>
+                      <p className="text-[11px] text-muted-foreground font-medium">
+                        {m.dose} {m.unit} · {m.frequency}
+                      </p>
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-primary/15 text-primary">
+                      Med
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {MOCK_OCR_RESULT.visits.length > 0 && (
+            <>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 px-1">
+                Past visits ({MOCK_OCR_RESULT.visits.length})
+              </p>
+              <div className="space-y-2 mb-5">
+                {MOCK_OCR_RESULT.visits.map((v, i) => (
+                  <div key={i} className="glass rounded-3xl p-4 shadow-soft flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center text-foreground shrink-0">
+                      <Calendar size={16} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-foreground text-sm truncate">{v.reason}</p>
+                      <p className="text-[11px] text-muted-foreground font-medium">
+                        {v.date} · {v.clinic}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
 
       {/* PICK */}
       {phase === "pick" && (

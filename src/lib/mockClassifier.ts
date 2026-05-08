@@ -22,29 +22,24 @@ export function classifyCapture(forced?: CaptureKind): {
   return { kind: k, confidence: k === "uncertain" ? 0.42 : 0.91 };
 }
 
-export const SAMPLE_CAPTURES: { id: string; label: string; kind: CaptureKind; thumb: string }[] = [
+// Teaching-only demo samples. Exactly 3 — Food label, Health concern, Vet document.
+export const SAMPLE_CAPTURES: { id: string; label: string; kind: Exclude<CaptureKind, "uncertain">; thumb: string }[] = [
   {
     id: "smp-food",
-    label: "Food bag",
+    label: "Food label",
     kind: "food",
     thumb: "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&q=80&w=200",
   },
   {
     id: "smp-health",
-    label: "Skin spot",
+    label: "Health concern",
     kind: "health",
     thumb: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=200",
   },
   {
     id: "smp-doc",
-    label: "Vet record",
+    label: "Vet document",
     kind: "doc",
-    thumb: "https://images.unsplash.com/photo-1583912267550-d6c2ac3196c0?auto=format&fit=crop&q=80&w=200",
-  },
-  {
-    id: "smp-uncertain",
-    label: "Unclear",
-    kind: "uncertain",
-    thumb: "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&q=80&w=200",
+    thumb: "https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&q=80&w=200",
   },
 ];
