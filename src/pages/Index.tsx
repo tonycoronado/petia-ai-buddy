@@ -97,6 +97,7 @@ const Inner = () => {
   };
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
   const [showAccount, setShowAccount] = useState(false);
   const [showSwitcher, setShowSwitcher] = useState(false);
   const [followUpFor, setFollowUpFor] = useState<string | null>(null);
