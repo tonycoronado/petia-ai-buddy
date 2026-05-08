@@ -121,6 +121,7 @@ const FoodScannerScreen = ({ petName, onUpgrade }: FoodScannerScreenProps) => {
             Personalized for {petName}
             {!isPremium && ` • ${Math.max(0, FREE_SCAN_LIMIT - scanCount)} free scans left`}
           </p>
+          </div>
         </div>
         <button
           onClick={() => setView(view === "scan" ? "history" : "scan")}
