@@ -28,13 +28,13 @@ export const SAMPLE_CAPTURES: { id: string; label: string; kind: Exclude<Capture
     id: "smp-food",
     label: "Food label",
     kind: "food",
-    thumb: "https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?auto=format&fit=crop&q=80&w=200",
+    thumb: "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?auto=format&fit=crop&q=80&w=200",
   },
   {
     id: "smp-health",
     label: "Health concern",
     kind: "health",
-    thumb: "https://images.unsplash.com/photo-1591946614720-90a587da4a36?auto=format&fit=crop&q=80&w=200",
+    thumb: "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&q=80&w=200",
   },
   {
     id: "smp-doc",
