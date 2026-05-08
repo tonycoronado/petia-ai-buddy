@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   BookHeart,
@@ -30,10 +31,20 @@ interface HealthScreenProps {
   onUpgrade: () => void;
 }
 
-// Mock recent activity preview
-const RECENT = [
+type RecentCategory = "Health" | "Vet" | "Weight" | "Mood";
+const RECENT: Array<{
+  id: string;
+  category: RecentCategory;
+  label: string;
+  title: string;
+  date: string;
+  status: string;
+  tone: string;
+  thumb: string;
+}> = [
   {
     id: "r1",
+    category: "Health",
     label: "Skin",
     title: "Redness behind left ear",
     date: "Apr 6",
@@ -43,12 +54,33 @@ const RECENT = [
   },
   {
     id: "r2",
+    category: "Vet",
     label: "Vet visit",
     title: "Itchy ears check-up",
     date: "Mar 22",
     status: "Resolved",
     tone: "bg-emerald-100 text-emerald-700",
     thumb: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=160",
+  },
+  {
+    id: "r3",
+    category: "Weight",
+    label: "Weight",
+    title: "Logged 12.4 kg",
+    date: "Apr 2",
+    status: "On track",
+    tone: "bg-secondary text-foreground",
+    thumb: "https://images.unsplash.com/photo-1558944351-c2c0e9bbb15c?auto=format&fit=crop&q=80&w=160",
+  },
+  {
+    id: "r4",
+    category: "Mood",
+    label: "Mood",
+    title: "Happy and energetic",
+    date: "Apr 1",
+    status: "Happy",
+    tone: "bg-primary/15 text-primary",
+    thumb: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=160",
   },
 ];
 
@@ -65,6 +97,11 @@ const HealthScreen = ({
 }: HealthScreenProps) => {
   const { isPremium } = useAppSettings();
   const petId = String(activePet.id);
+  const [filter, setFilter] = useState<"All" | RecentCategory>("All");
+  const filteredRecent = useMemo(
+    () => (filter === "All" ? RECENT : RECENT.filter((r) => r.category === filter)),
+    [filter],
+  );
 
   const lastVet = MOCK_VET_VISITS.find((v) => v.petId === petId);
   const weights = MOCK_WEIGHT[petId] ?? [];
@@ -149,19 +186,31 @@ const HealthScreen = ({
         </button>
       </div>
       <div className="flex gap-1.5 mb-3 overflow-x-auto no-scrollbar -mx-1 px-1">
-        {["All", "Health", "Vet", "Weight", "Mood"].map((c, i) => (
-          <button
-            key={c}
-            className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap min-h-[32px] ${
-              i === 0 ? "gradient-cta text-primary-foreground shadow-glow" : "glass-ghost text-foreground"
-            }`}
-          >
-            {c}
-          </button>
-        ))}
+        {(["All", "Health", "Vet", "Weight", "Mood"] as const).map((c) => {
+          const active = filter === c;
+          return (
+            <button
+              key={c}
+              onClick={() => setFilter(c)}
+              aria-pressed={active}
+              className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap min-h-[32px] transition-all ${
+                active ? "gradient-cta text-primary-foreground shadow-glow" : "glass-ghost text-foreground"
+              }`}
+            >
+              {c}
+            </button>
+          );
+        })}
       </div>
       <div className="space-y-2 mb-6">
-        {RECENT.map((r) => (
+        {filteredRecent.length === 0 && (
+          <div className="glass-ghost rounded-3xl p-5 text-center">
+            <p className="text-xs font-medium text-muted-foreground">
+              No {filter.toLowerCase()} entries yet for {activePet.name}.
+            </p>
+          </div>
+        )}
+        {filteredRecent.map((r) => (
           <button
             key={r.id}
             onClick={onOpenDiary}

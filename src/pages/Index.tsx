@@ -227,7 +227,7 @@ const Inner = () => {
             {subScreen === "records" && <ImportVetRecordsScreen petName={activePet.name} mode="library" onBack={() => pop()} onSkip={() => pop()} onComplete={() => pop()} onAddViaCapture={() => { pop(); goToCapture(); }} />}
             {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
-            {subScreen === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}
+            {subScreen === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} onBack={() => pop()} />}
             {subScreen === "referral" && <ReferralScreen onBack={() => pop()} />}
             {subScreen === "terms" && <LegalScreen title="Terms of Service" body={TERMS} onBack={() => pop()} />}
             {subScreen === "privacy" && <LegalScreen title="Privacy Policy" body={PRIVACY} onBack={() => pop()} />}
