@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Camera,
@@ -6,13 +6,14 @@ import {
   Loader2,
   Sparkles,
   ShieldCheck,
-  AlertTriangle,
   Stethoscope,
   FileText,
   ChevronRight,
   Check,
   X,
   RotateCcw,
+  Lock,
+  Shield,
 } from "lucide-react";
 import { toast } from "sonner";
 import { triggerHaptic } from "@/lib/haptic";
@@ -23,6 +24,7 @@ import {
   type CaptureKind,
 } from "@/lib/mockClassifier";
 import { MOCK_OCR_RESULT } from "@/lib/mockData";
+import { useAppSettings } from "@/lib/appSettings";
 import PetHeader from "./PetHeader";
 import type { Pet } from "./FloatingBubble";
 
@@ -32,9 +34,26 @@ interface SmartCaptureScreenProps {
   onOpenFullScanner: () => void;
   onOpenFullDiary: () => void;
   onOpenFullImport: () => void;
+  onUpgrade: () => void;
+  followUpFor?: string | null;
+  onClearFollowUp?: () => void;
 }
 
-type Phase = "pick" | "analyzing" | "uncertain" | "result";
+type Phase = "consent" | "pick" | "analyzing" | "uncertain" | "result" | "gated";
+
+// Mock per-session usage so post-classification gates feel real.
+let _foodScans = 0;
+let _healthLogs = 0;
+let _docImports = 0;
+const FREE_FOOD = 3;
+const FREE_HEALTH = 3;
+const FREE_DOC = 1;
+
+const ANALYZING_HINTS = [
+  "Checking if this is food, a symptom, or a document…",
+  "Looking at colors, shapes and text…",
+  "Matching to known patterns…",
+];
 
 const SmartCaptureScreen = ({
   activePet,
@@ -42,21 +61,60 @@ const SmartCaptureScreen = ({
   onOpenFullScanner,
   onOpenFullDiary,
   onOpenFullImport,
+  onUpgrade,
+  followUpFor,
+  onClearFollowUp,
 }: SmartCaptureScreenProps) => {
-  const [phase, setPhase] = useState<Phase>("pick");
+  const { aiEnabled, setAiEnabled, isPremium } = useAppSettings();
+  const [phase, setPhase] = useState<Phase>(aiEnabled ? "pick" : "consent");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [kind, setKind] = useState<Exclude<CaptureKind, "uncertain">>("food");
+  const [hintIdx, setHintIdx] = useState(0);
+  const [gatedKind, setGatedKind] = useState<Exclude<CaptureKind, "uncertain">>("food");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Re-evaluate consent when setting changes
+  useEffect(() => {
+    if (!aiEnabled && phase !== "consent") setPhase("consent");
+    if (aiEnabled && phase === "consent") setPhase("pick");
+  }, [aiEnabled]); // eslint-disable-line
+
+  // Rotate analyzing hints
+  useEffect(() => {
+    if (phase !== "analyzing") return;
+    const t = setInterval(() => setHintIdx((i) => (i + 1) % ANALYZING_HINTS.length), 500);
+    return () => clearInterval(t);
+  }, [phase]);
+
+  const checkGate = (k: Exclude<CaptureKind, "uncertain">): boolean => {
+    if (isPremium) return false;
+    if (k === "food" && _foodScans >= FREE_FOOD) return true;
+    if (k === "health" && _healthLogs >= FREE_HEALTH) return true;
+    if (k === "doc" && _docImports >= FREE_DOC) return true;
+    return false;
+  };
+
+  const incrementUsage = (k: Exclude<CaptureKind, "uncertain">) => {
+    if (k === "food") _foodScans += 1;
+    if (k === "health") _healthLogs += 1;
+    if (k === "doc") _docImports += 1;
+  };
 
   const startAnalyze = (forced?: CaptureKind, thumb?: string) => {
     triggerHaptic("light");
     if (thumb) setPhotoUrl(thumb);
+    setHintIdx(0);
     setPhase("analyzing");
     setTimeout(() => {
       const { kind: k } = classifyCapture(forced);
       if (k === "uncertain") {
         setPhase("uncertain");
       } else {
+        if (checkGate(k)) {
+          setGatedKind(k);
+          setPhase("gated");
+          return;
+        }
         setKind(k);
         setPhase("result");
         triggerHaptic("success");
@@ -73,10 +131,15 @@ const SmartCaptureScreen = ({
 
   const reset = () => {
     setPhotoUrl(null);
-    setPhase("pick");
+    setPhase(aiEnabled ? "pick" : "consent");
   };
 
   const correctType = (k: Exclude<CaptureKind, "uncertain">) => {
+    if (checkGate(k)) {
+      setGatedKind(k);
+      setPhase("gated");
+      return;
+    }
     setKind(k);
     setPhase("result");
     toast.success(`Switched to ${CAPTURE_LABEL[k]}`);
@@ -92,9 +155,9 @@ const SmartCaptureScreen = ({
       <PetHeader
         activePet={activePet}
         onTapPet={onTapPet}
-        subtitle="Capturing for"
+        subtitle={followUpFor ? "Follow-up for" : "Capturing for"}
         right={
-          phase !== "pick" && (
+          phase !== "pick" && phase !== "consent" && (
             <button
               onClick={reset}
               className="px-3 py-2 rounded-2xl glass shadow-soft text-[10px] font-black uppercase tracking-widest text-foreground flex items-center gap-1"
@@ -107,8 +170,27 @@ const SmartCaptureScreen = ({
 
       <h1 className="text-3xl font-black tracking-tight text-foreground mb-1">Smart Capture</h1>
       <p className="text-sm text-muted-foreground font-medium mb-6">
-        One photo. Petia figures out what it is.
+        {followUpFor
+          ? `Adding a follow-up to ${activePet.name}'s health entry.`
+          : "One photo. Petia figures out what it is."}
       </p>
+
+      {followUpFor && (
+        <div className="glass rounded-3xl p-3 shadow-soft mb-5 flex items-center gap-3 border border-emerald-200">
+          <div className="w-9 h-9 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
+            <Stethoscope size={16} />
+          </div>
+          <p className="text-[11px] text-foreground font-bold flex-1">
+            Linking to: spot behind the left ear (Apr 6)
+          </p>
+          <button
+            onClick={onClearFollowUp}
+            className="text-[10px] font-black text-muted-foreground uppercase tracking-widest"
+          >
+            Clear
+          </button>
+        </div>
+      )}
 
       <input
         ref={fileRef}
@@ -120,6 +202,51 @@ const SmartCaptureScreen = ({
       />
 
       <AnimatePresence mode="wait">
+        {phase === "consent" && (
+          <motion.div
+            key="consent"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="glass rounded-5xl p-6 shadow-soft mb-4">
+              <div className="w-14 h-14 rounded-3xl gradient-cta flex items-center justify-center text-primary-foreground shadow-glow mb-4">
+                <Shield size={22} />
+              </div>
+              <h2 className="text-xl font-black text-foreground mb-2 leading-tight">
+                Enable AI to use Smart Capture
+              </h2>
+              <p className="text-sm text-muted-foreground font-medium leading-relaxed mb-5">
+                Petia analyzes the photo to recognize food, a health concern, or a vet
+                document. Photos stay private and aren't used to train any model.
+              </p>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={() => {
+                  setAiEnabled(true);
+                  setPhase("pick");
+                  triggerHaptic("success");
+                }}
+                className="w-full py-4 gradient-cta text-primary-foreground rounded-3xl font-bold shadow-glow mb-3"
+              >
+                Enable AI
+              </motion.button>
+              <button
+                onClick={() => toast.message("AI stays off. Turn it on later in Account.")}
+                className="w-full text-xs font-bold text-muted-foreground py-2"
+              >
+                Not now
+              </button>
+            </div>
+            <button
+              onClick={() => toast.message("AI disclosure available in Account → Privacy")}
+              className="w-full text-center text-[10px] font-black text-primary uppercase tracking-widest py-2"
+            >
+              View AI disclosure
+            </button>
+          </motion.div>
+        )}
+
         {phase === "pick" && (
           <motion.div
             key="pick"
@@ -137,14 +264,14 @@ const SmartCaptureScreen = ({
                 </div>
               </div>
               <p className="text-center text-muted-foreground text-sm font-medium max-w-[260px] mb-6">
-                Food label, a symptom, or a vet document — Petia routes it for you.
+                Show Petia anything — food, a concern, or a vet paper.
               </p>
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={() => fileRef.current?.click()}
                 className="w-full py-4 gradient-cta text-primary-foreground rounded-3xl font-bold shadow-glow flex items-center justify-center gap-2"
               >
-                <Camera size={18} /> Open camera
+                <Camera size={18} /> Take photo
               </motion.button>
               <button
                 onClick={() => fileRef.current?.click()}
@@ -157,19 +284,21 @@ const SmartCaptureScreen = ({
             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3 px-1">
               Try a sample
             </p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               {SAMPLE_CAPTURES.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => startAnalyze(s.kind, s.thumb)}
-                  className="glass rounded-3xl p-3 shadow-soft text-left active:scale-[0.97] transition"
+                  className="rounded-2xl p-2 bg-muted/60 text-left active:scale-[0.97] transition"
                 >
                   <img
                     src={s.thumb}
                     alt={s.label}
-                    className="w-full h-20 rounded-2xl object-cover mb-2"
+                    className="w-full h-16 rounded-xl object-cover mb-1.5"
                   />
-                  <p className="font-black text-foreground text-xs">{s.label}</p>
+                  <p className="font-bold text-foreground/80 text-[10px] leading-tight">
+                    {s.label}
+                  </p>
                 </button>
               ))}
             </div>
@@ -195,9 +324,17 @@ const SmartCaptureScreen = ({
               <Loader2 size={26} className="text-primary-foreground animate-spin" />
             </div>
             <p className="font-black text-foreground text-base mb-1">Understanding photo…</p>
-            <p className="text-xs text-muted-foreground font-medium text-center max-w-[240px]">
-              Checking if this is food, a symptom, or a document.
-            </p>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={hintIdx}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-xs text-muted-foreground font-medium text-center max-w-[240px]"
+              >
+                {ANALYZING_HINTS[hintIdx]}
+              </motion.p>
+            </AnimatePresence>
           </motion.div>
         )}
 
@@ -246,6 +383,49 @@ const SmartCaptureScreen = ({
           </motion.div>
         )}
 
+        {phase === "gated" && (
+          <motion.div
+            key="gated"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="glass rounded-5xl p-6 shadow-soft mb-4">
+              <div className="w-14 h-14 rounded-3xl bg-secondary flex items-center justify-center text-foreground shadow-soft mb-4">
+                <Lock size={22} />
+              </div>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">
+                {CAPTURE_LABEL[gatedKind]} — limit reached
+              </p>
+              <h2 className="text-xl font-black text-foreground mb-2 leading-tight">
+                Petia recognized this, but you've used your free {CAPTURE_LABEL[gatedKind].toLowerCase()} quota.
+              </h2>
+              <p className="text-sm text-muted-foreground font-medium leading-relaxed mb-5">
+                Upgrade to keep saving unlimited{" "}
+                {gatedKind === "food"
+                  ? "food scans"
+                  : gatedKind === "health"
+                  ? "health observations"
+                  : "vet document imports"}
+                .
+              </p>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={onUpgrade}
+                className="w-full py-4 gradient-cta text-primary-foreground rounded-3xl font-bold shadow-glow mb-3 flex items-center justify-center gap-2"
+              >
+                <Sparkles size={16} /> Upgrade
+              </motion.button>
+              <button
+                onClick={reset}
+                className="w-full text-xs font-bold text-muted-foreground py-2"
+              >
+                Maybe later
+              </button>
+            </div>
+          </motion.div>
+        )}
+
         {phase === "result" && (
           <motion.div
             key="result"
@@ -257,6 +437,7 @@ const SmartCaptureScreen = ({
               kind={kind}
               petName={activePet.name}
               photoUrl={photoUrl}
+              followUp={!!followUpFor && kind === "health"}
               onCorrect={correctType}
               onOpenFull={() => {
                 if (kind === "food") onOpenFullScanner();
@@ -265,7 +446,10 @@ const SmartCaptureScreen = ({
               }}
               onSave={() => {
                 triggerHaptic("success");
-                toast.success(`${CAPTURE_LABEL[kind]} saved to ${activePet.name}'s history`);
+                incrementUsage(kind);
+                const label = followUpFor && kind === "health" ? "Follow-up" : CAPTURE_LABEL[kind];
+                toast.success(`${label} saved to ${activePet.name}'s history`);
+                if (followUpFor) onClearFollowUp?.();
                 reset();
               }}
               onDiscard={reset}
@@ -309,6 +493,7 @@ const ResultPreview = ({
   kind,
   petName,
   photoUrl,
+  followUp,
   onCorrect,
   onOpenFull,
   onSave,
@@ -317,6 +502,7 @@ const ResultPreview = ({
   kind: Exclude<CaptureKind, "uncertain">;
   petName: string;
   photoUrl: string | null;
+  followUp: boolean;
   onCorrect: (k: Exclude<CaptureKind, "uncertain">) => void;
   onOpenFull: () => void;
   onSave: () => void;
@@ -335,11 +521,11 @@ const ResultPreview = ({
     },
     health: {
       icon: Stethoscope,
-      label: "Health observation",
+      label: followUp ? "Health follow-up" : "Health observation",
       tone: "bg-warning text-warning-foreground",
-      headline: "Possible skin redness",
-      sub: "Status: Observe",
-      meta: "Worth re-checking in 48h",
+      headline: followUp ? "Compared to Apr 6 photo" : "Possible skin redness",
+      sub: followUp ? "Status: Improving" : "Status: Observe",
+      meta: followUp ? "Side-by-side comparison saved" : "Worth re-checking in 48h",
     },
     doc: {
       icon: FileText,
