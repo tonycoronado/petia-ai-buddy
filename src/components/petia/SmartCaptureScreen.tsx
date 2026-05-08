@@ -82,7 +82,7 @@ const SmartCaptureScreen = ({
   // Rotate analyzing hints
   useEffect(() => {
     if (phase !== "analyzing") return;
-    const t = setInterval(() => setHintIdx((i) => (i + 1) % ANALYZING_HINTS.length), 500);
+    const t = setInterval(() => setHintIdx((i) => (i + 1) % ANALYZING_HINTS.length), 1500);
     return () => clearInterval(t);
   }, [phase]);
 
@@ -107,10 +107,6 @@ const SmartCaptureScreen = ({
     setPhase("analyzing");
     setTimeout(() => {
       const { kind: k } = classifyCapture(forced);
-      // realistic AI pause
-    }, 0);
-    setTimeout(() => {
-      const { kind: k } = classifyCapture(forced);
       if (k === "uncertain") {
         setPhase("uncertain");
       } else {
@@ -123,7 +119,7 @@ const SmartCaptureScreen = ({
         setPhase("result");
         triggerHaptic("success");
       }
-    }, 1400);
+    }, 6000);
   };
 
   const onFile = (f: File | undefined) => {
