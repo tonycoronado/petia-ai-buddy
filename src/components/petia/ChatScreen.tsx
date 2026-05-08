@@ -13,6 +13,7 @@ interface Message {
 interface ChatScreenProps {
   pet: Pet;
   onUpgrade: () => void;
+  onBack?: () => void;
 }
 
 const FREE_LIMIT = 3;
