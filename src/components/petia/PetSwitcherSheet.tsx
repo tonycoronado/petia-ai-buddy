@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { X, Plus, Check } from "lucide-react";
-import FloatingBubble, { type Pet } from "../FloatingBubble";
+import FloatingBubble, { type Pet } from "./FloatingBubble";
 
 interface PetSwitcherSheetProps {
   pets: Pet[];
