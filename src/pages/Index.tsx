@@ -113,7 +113,10 @@ const Inner = () => {
     return () => clearTimeout(t);
   }, []);
 
-  const openPaywall = () => setShowPaywall(true);
+  const openPaywall = (reason?: string) => {
+    setPaywallReason(reason);
+    setShowPaywall(true);
+  };
 
   const handleSwitchPet = (pet: Pet) => {
     if (String(pet.id) === String(activePet.id)) {
