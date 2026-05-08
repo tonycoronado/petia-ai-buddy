@@ -34,6 +34,7 @@ type SubScreenId =
   | "reminders"
   | "vet"
   | "import"
+  | "records"
   | "insights"
   | "pdf"
   | "scanner"
