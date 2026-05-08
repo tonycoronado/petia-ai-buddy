@@ -6,6 +6,7 @@ import { useAppSettings } from "@/lib/appSettings";
 
 interface PaywallScreenProps {
   onClose: () => void;
+  reason?: string;
 }
 
 const FEATURES = [
@@ -18,7 +19,7 @@ const FEATURES = [
   "Vet Visit PDF Export",
 ];
 
-const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
+const PaywallScreen = ({ onClose, reason }: PaywallScreenProps) => {
   const { startTrial } = useAppSettings();
   const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
 
