@@ -248,25 +248,7 @@ const TodayScreen = ({
         </>
       )}
 
-      {/* FOR YOU — actionable rows */}
-      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 mt-3 px-1">
-        For you
-      </p>
-      <div className="space-y-3 mb-6">
-        <SuggestionRow
-          icon={Scale}
-          title={`Log ${activePet.name}'s weight`}
-          hint="18 days since last entry"
-          onClick={onOpenWeight}
-        />
-        <SuggestionRow
-          icon={Sparkles}
-          title="Weekly insights"
-          hint={isPremium ? "New summary ready" : "Mood, food & health patterns"}
-          onClick={isPremium ? onOpenInsights : onUpgrade}
-          premium={!isPremium}
-        />
-      </div>
+      {/* For-you suggestions moved to Care to keep Today focused on what's needed now. */}
 
       {/* EMERGENCY VET — pinned safety footer */}
       <motion.button
