@@ -186,19 +186,31 @@ const HealthScreen = ({
         </button>
       </div>
       <div className="flex gap-1.5 mb-3 overflow-x-auto no-scrollbar -mx-1 px-1">
-        {["All", "Health", "Vet", "Weight", "Mood"].map((c, i) => (
-          <button
-            key={c}
-            className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap min-h-[32px] ${
-              i === 0 ? "gradient-cta text-primary-foreground shadow-glow" : "glass-ghost text-foreground"
-            }`}
-          >
-            {c}
-          </button>
-        ))}
+        {(["All", "Health", "Vet", "Weight", "Mood"] as const).map((c) => {
+          const active = filter === c;
+          return (
+            <button
+              key={c}
+              onClick={() => setFilter(c)}
+              aria-pressed={active}
+              className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap min-h-[32px] transition-all ${
+                active ? "gradient-cta text-primary-foreground shadow-glow" : "glass-ghost text-foreground"
+              }`}
+            >
+              {c}
+            </button>
+          );
+        })}
       </div>
       <div className="space-y-2 mb-6">
-        {RECENT.map((r) => (
+        {filteredRecent.length === 0 && (
+          <div className="glass-ghost rounded-3xl p-5 text-center">
+            <p className="text-xs font-medium text-muted-foreground">
+              No {filter.toLowerCase()} entries yet for {activePet.name}.
+            </p>
+          </div>
+        )}
+        {filteredRecent.map((r) => (
           <button
             key={r.id}
             onClick={onOpenDiary}
