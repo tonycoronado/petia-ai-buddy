@@ -74,7 +74,7 @@ const SCORE_CONFIG = {
 
 const FREE_SCAN_LIMIT = 3;
 
-const FoodScannerScreen = ({ petName, onUpgrade }: FoodScannerScreenProps) => {
+const FoodScannerScreen = ({ petName, onUpgrade, onBack }: FoodScannerScreenProps) => {
   const { isPremium } = useAppSettings();
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
