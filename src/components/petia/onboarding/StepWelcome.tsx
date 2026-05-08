@@ -1,12 +1,11 @@
 import { motion } from "framer-motion";
-import { Camera, Smile, Bell, Sparkles } from "lucide-react";
-import type { PetData } from "../OnboardingWizard";
+import { Camera, Smile, Bell, FileHeart } from "lucide-react";
 
 const FEATS = [
-  { icon: Camera, label: "AI Food Scanner", desc: "Check if any food is safe for your pet" },
-  { icon: Smile, label: "Mood & Health Diary", desc: "Track patterns and visual changes over time" },
-  { icon: Bell, label: "Smart Reminders", desc: "Vaccinations, medication, vet visits" },
-  { icon: Sparkles, label: "Weekly AI Insights", desc: "Personalized care reports every Monday" },
+  { icon: Smile, label: "Daily care", desc: "Mood, meals, and gentle nudges" },
+  { icon: Camera, label: "Smart Capture", desc: "One photo — food, health, or vet doc" },
+  { icon: Bell, label: "Reminders", desc: "Vaccines, meds, vet visits" },
+  { icon: FileHeart, label: "Health history", desc: "All records, in one place" },
 ];
 
 interface Props { next: () => void; }
@@ -15,8 +14,8 @@ const StepWelcome = ({ next }: Props) => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
     <span className="text-5xl mb-4 block">🐾</span>
     <h1 className="text-3xl font-black tracking-tight text-foreground mb-2">Welcome to Petia</h1>
-    <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
-      Your pet's personal care companion. Let's set up their profile.
+    <p className="text-muted-foreground font-medium mb-8 leading-relaxed text-sm">
+      Your pet's calm, personal care companion.
     </p>
     <div className="space-y-3 mb-10 text-left">
       {FEATS.map((f) => (

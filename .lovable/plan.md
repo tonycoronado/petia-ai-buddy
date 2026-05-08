@@ -1,58 +1,56 @@
-Polish pass on the approved Petia mobile IA. No new features, no brand changes, no removed features.
+# Petia Onboarding v2 — Fast, Premium, Mobile
 
-## 1. Today subline (TodayScreen.tsx)
-Replace count-style sublines with hero-priority phrasing:
-- overdue → "Start with what's overdue."
-- due → "Top priority for {pet} today."
-- followup → "One health item to re-check."
-- clear → "{pet} is all set." (unchanged)
+Scope: Wire onboarding into the app, refactor existing steps into the approved flow, and add three new screens (Health context, Permissions primer, Ready) + a soft trial offer reusing the existing Paywall. No brand, color, type, spacing, or IA changes.
 
-## 2. Smart Capture — single primary CTA (SmartCaptureScreen.tsx, `pick` phase)
-Make the big circle a viewfinder visual anchor, not a button:
-- Convert the 40 px Camera circle to a non-interactive `<div>` (no tap handler, no "Take a photo" copy inside it). Keep the gradient ring + glass interior; show only the camera glyph + a faint dashed corner-frame to read as a viewfinder.
-- Keep the single primary `Take photo` gradient button below as the only photo CTA.
-- Keep the secondary `Upload from library` text link.
+## Flow (9 steps + soft paywall)
 
-## 3. Sample thumbnails (mockClassifier.ts)
-Swap the two misleading Unsplash URLs for clearer ones:
-- Food label → kibble bag / pet food packaging shot.
-- Health concern → close-up that visibly reads as a concern (e.g. paw/skin/ear close-up), not a happy portrait.
-- Vet document → keep as-is.
-Use stable Unsplash photo IDs only; no new assets.
+1. **Welcome** — keep `StepWelcome`, tighten copy: "Daily care, Smart Capture, reminders, and health history." CTA: Get started.
+2. **Pet basics** — merge `StepName` + `StepSpecies` into one screen `StepBasics`. Name input on top, Dog/Cat tile pair below. Single Continue.
+3. **Age & weight** — merge `StepAge` + `StepWeight` into `StepAgeWeight`. Age pills (Puppy/Young/Adult/Senior) + weight slider. Skip link in header.
+4. **Photo** — keep `StepPhoto`, copy emphasizes warmth ("Make Petia personal"). Skip link.
+5. **Health context** (new) — `StepHealthContext`. Multi-select chips: Allergies, Medical conditions, Medication, Sensitive stomach, Skin issues, None (None deselects others). Optional one-line note. Skip link.
+6. **AI consent** — keep `StepAIConsent`, trim copy. Two CTAs: Enable AI features (primary, gradient), Continue without AI (ghost). "View AI disclosure" opens a sonner toast naming Anthropic, Google, OpenAI + no-training note.
+7. **Permissions primer** (new) — `StepPermissions`. Two glass rows with icons: Camera & Photos (Smart Capture), Notifications (reminders). Single Continue. No native prompts in prototype.
+8. **Ready** (new) — `StepReady`. "Petia is ready for {name}." Pet photo (or initial bubble) + 4 glass rows: Track daily mood, Use Smart Capture, Set reminders, Keep health history. CTA: Open Petia.
+9. **Soft trial offer** (new) — `OnboardingTrialOffer` component. Reuses Paywall styling. Three options: 7-day Premium trial (default highlighted), Monthly, Annual (Save 33% pill). Personalized benefit list referencing pet name. Restore purchases link. **Continue free** clearly visible as equal-weight text button (not hidden, not tiny).
 
-## 4. Care helpers grouping (CareScreen.tsx)
-- Section label becomes `Petia helpers · Premium` (single inline pill on the right of the label is fine).
-- Remove the per-row `Lock` icon and the `locked` prop usage in the helper rows.
-- Keep the single shared `Unlock Petia helpers` CTA at the bottom.
-- Behavior unchanged: tapping a helper while non-premium still routes to `onUpgrade`.
+After 9: trial → Today (premium flag mock); free → Today (free limits).
 
-## 5. AI disclosure copy (AccountSheet.tsx)
-Replace `Powered by Anthropic — no training on your data` with neutral copy:
-- Sub: `AI features enabled · View disclosure` when `aiEnabled`, otherwise `AI features off · View disclosure`.
-- Tapping the row label area opens a short toast/info: "Petia uses Anthropic, Google and OpenAI for different AI features. Photos and data are never used to train models."
-- Switch behavior unchanged.
+## UX rules applied
+- Progress bar shows 1/9…9/9 (already in wizard); hidden on Trial Offer.
+- Skip link top-right on steps 3, 4, 5.
+- Auth removed from onboarding (existing `StepAuth` is mock-only; the prototype is zero-backend per project memory). Account/sign-in stays in Account sheet as today.
+- One idea per screen; no forms longer than 2 fields.
+- Animations reuse the wizard's slide transition.
 
-## 6. Emergency Vet — calmer safety affordance (TodayScreen.tsx only)
-- Keep it only on Today (already removed elsewhere).
-- Restyle the footer card so it reads as safety, not alert: neutral glass surface, small `Siren` glyph in a soft `bg-muted` circle (not destructive red fill), label `Emergency vet`, sub `Find the nearest 24/7 clinic`, with a subtle right-aligned `ChevronRight`. Drop the `border-destructive/20` and the destructive icon background.
+## Wiring (Index.tsx)
+- Add `useState` `hasOnboarded` (in-memory; defaults false on fresh load — prototype, no persistence required).
+- After splash, if `!hasOnboarded`, render `<OnboardingWizard onComplete={(data) => { setOnboardData(data); setShowTrialOffer(true); }} />`.
+- After wizard: render `<OnboardingTrialOffer onChoose={(plan) => { setHasOnboarded(true); /* mock premium if trial */ }} />`.
+- Then normal Today screen renders. Active pet swaps to onboarded pet name/photo (extend `MOCK_PETS[0]` shallow-merge for prototype).
 
-## 7. Capture nav active state (BottomNav.tsx)
-- Remove `ring-4 ring-primary/30` (reads as a harsh outline).
-- When `activeTab === "capture"`, indicate active state with the existing teal language only: a slightly stronger `shadow-glow` (already present) plus `scale-105` on the gradient button. No ring, no border.
-- Keep focus-visible ring for keyboard a11y via Tailwind defaults (no custom outline).
+## Files
 
-## 8. Realistic analysis pause (SmartCaptureScreen.tsx)
-- Bump `setTimeout` in `startAnalyze` from 1400 ms to 6000 ms.
-- Slow the hint rotator: change interval from 500 ms to ~1500 ms so the 3 hints cycle smoothly across ~6 s without flicker.
-- Keep the `Understanding photo…` heading, spinner, and thumbnail; no copy redesign.
+**New**
+- `src/components/petia/onboarding/StepBasics.tsx`
+- `src/components/petia/onboarding/StepAgeWeight.tsx`
+- `src/components/petia/onboarding/StepHealthContext.tsx`
+- `src/components/petia/onboarding/StepPermissions.tsx`
+- `src/components/petia/onboarding/StepReady.tsx`
+- `src/components/petia/onboarding/OnboardingTrialOffer.tsx`
+
+**Edited**
+- `src/components/petia/OnboardingWizard.tsx` — new step order, TOTAL=9, extend `PetData` with `health: string[]`, `healthNote: string`, drop Auth step from sequence (file kept for now, not imported).
+- `src/components/petia/onboarding/StepWelcome.tsx` — tightened copy.
+- `src/components/petia/onboarding/StepAIConsent.tsx` — add secondary "Continue without AI" + disclosure toast.
+- `src/components/petia/onboarding/StepPhoto.tsx` — Skip link.
+- `src/pages/Index.tsx` — mount wizard + trial offer before main app; merge onboarded pet into active pet.
+
+**Untouched**
+- All branding, tokens, BottomNav, Today/Health/Capture/Care/Account screens, Paywall (referenced for visual parity only).
+
+## Visual conventions
+- Glass cards (`glass rounded-3xl shadow-soft`), gradient CTA (`gradient-cta text-primary-foreground`), `Sparkles`/`Camera`/`Bell`/`Heart` lucide icons. No new colors. No new fonts.
 
 ## Out of scope
-No changes to Health, ImportVetRecords, mock data shape, routing, or any business logic. No new screens or features.
-
-## Files touched
-- src/components/petia/TodayScreen.tsx
-- src/components/petia/SmartCaptureScreen.tsx
-- src/components/petia/CareScreen.tsx
-- src/components/petia/BottomNav.tsx
-- src/components/petia/account/AccountSheet.tsx
-- src/lib/mockClassifier.ts
+- Real auth, real permission prompts, persistence, analytics, A/B copy variants, additional pet creation inside trial offer.

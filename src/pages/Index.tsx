@@ -22,6 +22,8 @@ import LegalScreen from "@/components/petia/account/LegalScreen";
 import BottomNav from "@/components/petia/BottomNav";
 import SplashScreen from "@/components/petia/SplashScreen";
 import PetSwitcherSheet from "@/components/petia/PetSwitcherSheet";
+import OnboardingWizard, { type PetData } from "@/components/petia/OnboardingWizard";
+import OnboardingTrialOffer from "@/components/petia/onboarding/OnboardingTrialOffer";
 import type { Pet } from "@/components/petia/FloatingBubble";
 import { MOCK_PETS } from "@/lib/mockData";
 import { AppSettingsProvider } from "@/lib/appSettings";
@@ -62,9 +64,29 @@ const PRIVACY = [
 const Inner = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [splashExit, setSplashExit] = useState(false);
+  const [hasOnboarded, setHasOnboarded] = useState(false);
+  const [showTrialOffer, setShowTrialOffer] = useState(false);
+  const [onboardedName, setOnboardedName] = useState<string>("your pet");
   const [tab, setTab] = useState("today");
   const { current: subScreen, push, pop, reset } = useScreenStack<SubScreenId>();
   const [activePet, setActivePet] = useState<Pet>(MOCK_PETS[0]);
+
+  const handleOnboardingComplete = (data: PetData) => {
+    const name = data.name.trim() || "your pet";
+    setOnboardedName(name);
+    setActivePet((prev) => ({
+      ...prev,
+      name,
+      img: data.photoUrl || prev.img,
+      weight: data.weightValue ? `${data.weightValue.toFixed(1)}kg` : prev.weight,
+    }));
+    setShowTrialOffer(true);
+  };
+
+  const finishOnboarding = () => {
+    setShowTrialOffer(false);
+    setHasOnboarded(true);
+  };
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
@@ -112,7 +134,22 @@ const Inner = () => {
       </AnimatePresence>
       {showSplash && splashExit && <SplashExiter onDone={() => setShowSplash(false)} />}
 
-      {!showSplash && (
+      <AnimatePresence>
+        {!showSplash && !hasOnboarded && !showTrialOffer && (
+          <OnboardingWizard onComplete={handleOnboardingComplete} />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showTrialOffer && (
+          <OnboardingTrialOffer
+            petName={onboardedName}
+            onContinueFree={finishOnboarding}
+            onStartTrial={finishOnboarding}
+          />
+        )}
+      </AnimatePresence>
+
+      {!showSplash && hasOnboarded && (
         <>
           <AnimatePresence mode="wait">
             {!subScreen && tab === "today" && (
