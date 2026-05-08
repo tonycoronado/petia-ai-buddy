@@ -43,12 +43,20 @@ const StepBasics = ({ petData, update, next }: Props) => {
             transition={{ delay: i * 0.08 }}
             whileTap={{ scale: 0.96 }}
             onClick={() => update({ species: sp.value })}
-            className={`glass rounded-3xl p-6 flex flex-col items-center gap-3 shadow-soft transition-all ${
-              petData.species === sp.value ? "ring-2 ring-primary shadow-glow" : ""
+            className={`rounded-3xl p-6 flex flex-col items-center gap-3 transition-all ${
+              petData.species === sp.value
+                ? "gradient-cta text-primary-foreground shadow-glow ring-2 ring-primary scale-[1.02]"
+                : "glass shadow-soft"
             }`}
           >
             <span className="text-4xl">{sp.emoji}</span>
-            <span className="font-bold text-sm text-foreground">{sp.label}</span>
+            <span
+              className={`font-bold text-sm ${
+                petData.species === sp.value ? "text-primary-foreground" : "text-foreground"
+              }`}
+            >
+              {sp.label}
+            </span>
           </motion.button>
         ))}
       </div>
