@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Send, Sparkles } from "lucide-react";
+import { ArrowLeft, Send, Sparkles } from "lucide-react";
 import type { Pet } from "./FloatingBubble";
 import { PET_DETAILS } from "@/lib/mockData";
 import { useAppSettings } from "@/lib/appSettings";
