@@ -179,13 +179,20 @@ const AccountSheet = ({
         </div>
 
         {/* Other */}
-        <div className="glass rounded-3xl p-2 shadow-soft mb-5 divide-y divide-border">
-          <Row icon={Gift} label="Refer a friend" sub="Both get 1 month free" onClick={onOpenReferral} />
+        <div className="glass rounded-3xl p-2 shadow-soft mb-3 divide-y divide-border">
           <Row icon={Download} label="Export my data" onClick={() => toast.success("Export queued — we'll email you")} />
           <Row icon={FileText} label="Terms of Service" onClick={onOpenTerms} />
           <Row icon={ShieldCheck} label="Privacy Policy" onClick={onOpenPrivacy} />
           <Row icon={HelpCircle} label="Support" sub="support@petia.app" onClick={() => toast.success("Email opened")} />
           <Row icon={CreditCard} label="App version" sub="1.0.0 (build 2026.04)" right={<span />} />
+        </div>
+
+        {/* More — secondary surface area */}
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 mt-4 px-1">
+          More
+        </p>
+        <div className="glass-ghost rounded-3xl p-2 shadow-soft mb-5">
+          <Row icon={Gift} label="Refer a friend" sub="Both get 1 month free" onClick={onOpenReferral} />
         </div>
 
         <button

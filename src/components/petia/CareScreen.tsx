@@ -5,9 +5,9 @@ import {
   MessageCircle,
   Wallet,
   ChevronRight,
-  Lock,
   Plus,
   CalendarCheck,
+  Scale,
 } from "lucide-react";
 import { MOCK_REMINDERS } from "@/lib/mockData";
 import { useAppSettings } from "@/lib/appSettings";
@@ -21,6 +21,7 @@ interface CareScreenProps {
   onOpenReminders: () => void;
   onOpenInsights: () => void;
   onOpenChat: () => void;
+  onOpenWeight?: () => void;
   onUpgrade: () => void;
 }
 
@@ -30,6 +31,7 @@ const CareScreen = ({
   onOpenReminders,
   onOpenInsights,
   onOpenChat,
+  onOpenWeight,
   onUpgrade,
 }: CareScreenProps) => {
   const { isPremium } = useAppSettings();
@@ -88,6 +90,14 @@ const CareScreen = ({
           hint="Review what's scheduled for today"
           onClick={onOpenReminders}
         />
+        {onOpenWeight && (
+          <Row
+            icon={Scale}
+            title={`Log ${activePet.name}'s weight`}
+            hint="Track changes month over month"
+            onClick={onOpenWeight}
+          />
+        )}
       </div>
 
       {/* HELPERS — premium */}
@@ -164,10 +174,7 @@ const Row = ({
       <Icon size={20} />
     </div>
     <div className="flex-1 min-w-0">
-      <p className="font-black text-foreground text-sm flex items-center gap-1.5">
-        {title}
-        {locked && <Lock size={11} className="text-muted-foreground" />}
-      </p>
+      <p className="font-black text-foreground text-sm">{title}</p>
       <p className="text-[11px] text-muted-foreground font-medium truncate">{hint}</p>
     </div>
     <ChevronRight size={16} className="text-muted-foreground" />

@@ -66,6 +66,7 @@ const Inner = () => {
   const [splashExit, setSplashExit] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [showTrialOffer, setShowTrialOffer] = useState(false);
+  const [trialOfferShown, setTrialOfferShown] = useState(false);
   const [onboardedName, setOnboardedName] = useState<string>("your pet");
   const [tab, setTab] = useState("today");
   const { current: subScreen, push, pop, reset } = useScreenStack<SubScreenId>();
@@ -80,15 +81,23 @@ const Inner = () => {
       img: data.photoUrl || prev.img,
       weight: data.weightValue ? `${data.weightValue.toFixed(1)}kg` : prev.weight,
     }));
-    setShowTrialOffer(true);
+    // Defer trial offer — don't show it before user feels Petia's value
+    setHasOnboarded(true);
   };
 
   const finishOnboarding = () => {
     setShowTrialOffer(false);
-    setHasOnboarded(true);
+    setTrialOfferShown(true);
+  };
+
+  const triggerDeferredTrialOffer = () => {
+    if (trialOfferShown) return;
+    setTrialOfferShown(true);
+    setTimeout(() => setShowTrialOffer(true), 800);
   };
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
   const [showAccount, setShowAccount] = useState(false);
   const [showSwitcher, setShowSwitcher] = useState(false);
   const [followUpFor, setFollowUpFor] = useState<string | null>(null);
@@ -104,7 +113,10 @@ const Inner = () => {
     return () => clearTimeout(t);
   }, []);
 
-  const openPaywall = () => setShowPaywall(true);
+  const openPaywall = (reason?: string) => {
+    setPaywallReason(reason);
+    setShowPaywall(true);
+  };
 
   const handleSwitchPet = (pet: Pet) => {
     if (String(pet.id) === String(activePet.id)) {
@@ -135,7 +147,7 @@ const Inner = () => {
       {showSplash && splashExit && <SplashExiter onDone={() => setShowSplash(false)} />}
 
       <AnimatePresence>
-        {!showSplash && !hasOnboarded && !showTrialOffer && (
+        {!showSplash && !hasOnboarded && (
           <OnboardingWizard onComplete={handleOnboardingComplete} />
         )}
       </AnimatePresence>
@@ -188,6 +200,7 @@ const Inner = () => {
                 onUpgrade={openPaywall}
                 followUpFor={followUpFor}
                 onClearFollowUp={() => setFollowUpFor(null)}
+                onFirstAiResult={triggerDeferredTrialOffer}
               />
             )}
             {!subScreen && tab === "care" && (
@@ -197,6 +210,7 @@ const Inner = () => {
                 onOpenReminders={() => push("reminders")}
                 onOpenInsights={() => push("insights")}
                 onOpenChat={() => push("chat")}
+                onOpenWeight={() => push("weight")}
                 onUpgrade={openPaywall}
               />
             )}
@@ -220,7 +234,7 @@ const Inner = () => {
           </AnimatePresence>
 
           <AnimatePresence>
-            {showPaywall && <PaywallScreen onClose={() => setShowPaywall(false)} />}
+            {showPaywall && <PaywallScreen onClose={() => { setShowPaywall(false); setPaywallReason(undefined); }} reason={paywallReason} />}
           </AnimatePresence>
           <AnimatePresence>
             {profileSheet && <PetProfileSheet pet={profileSheet} onClose={() => setProfileSheet(null)} />}

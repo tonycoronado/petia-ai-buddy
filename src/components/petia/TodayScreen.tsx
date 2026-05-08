@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Smile, Zap, Heart, Meh, Frown,
-  Bell, Sparkles, ChevronRight, Siren, Lightbulb, Scale,
+  Bell, ChevronRight, Siren, Sparkles, X,
 } from "lucide-react";
 import { triggerHaptic } from "@/lib/haptic";
 import { MOCK_REMINDERS } from "@/lib/mockData";
@@ -42,7 +42,8 @@ const TodayScreen = ({
   onOpenFollowUp,
   onUpgrade,
 }: TodayScreenProps) => {
-  const { isPremium } = useAppSettings();
+  const { isPremium, trialActive, trialDaysLeft } = useAppSettings();
+  const [trialBannerDismissed, setTrialBannerDismissed] = useState(false);
   const [moodLogged, setMoodLogged] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
 
@@ -99,7 +100,48 @@ const TodayScreen = ({
       exit={{ opacity: 0 }}
       className="pt-12 px-6 pb-32 overflow-y-auto"
     >
-      <PetHeader activePet={activePet} onTapPet={onTapPet} subtitle="Today for" />
+      <PetHeader
+        activePet={activePet}
+        onTapPet={onTapPet}
+        subtitle="Today for"
+        size="lg"
+        status={
+          heroKind === "overdue"
+            ? "Has something overdue"
+            : heroKind === "due"
+            ? `${dueToday.length} item${dueToday.length === 1 ? "" : "s"} today`
+            : heroKind === "followup"
+            ? "1 health follow-up"
+            : "All set today 🐾"
+        }
+      />
+
+      {trialActive && !trialBannerDismissed && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass rounded-3xl p-3 shadow-soft mb-4 flex items-center gap-3 border border-primary/20"
+        >
+          <div className="w-9 h-9 rounded-2xl gradient-cta flex items-center justify-center text-primary-foreground shadow-glow shrink-0">
+            <Sparkles size={16} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-black text-foreground text-xs leading-tight">
+              {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} of Petia PRO left
+            </p>
+            <p className="text-[10px] text-muted-foreground font-medium truncate">
+              Enjoying the premium helpers? Manage anytime in Account.
+            </p>
+          </div>
+          <button
+            onClick={() => setTrialBannerDismissed(true)}
+            aria-label="Dismiss"
+            className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground"
+          >
+            <X size={14} />
+          </button>
+        </motion.div>
+      )}
 
       <h1 className="text-4xl font-black tracking-tight text-foreground mb-1">Today</h1>
       <p className="text-sm text-muted-foreground font-medium mb-6">{subline}</p>
@@ -154,8 +196,10 @@ const TodayScreen = ({
           </div>
         ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-3">
-            <p className="font-bold text-foreground text-sm">Mood logged</p>
-            <p className="text-xs text-muted-foreground mt-1">Check back tomorrow.</p>
+            <p className="font-bold text-foreground text-sm">Got it — thanks 🐾</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Petia will check in with {activePet.name} again tomorrow.
+            </p>
           </motion.div>
         )}
       </motion.div>
@@ -206,25 +250,7 @@ const TodayScreen = ({
         </>
       )}
 
-      {/* FOR YOU — actionable rows */}
-      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 mt-3 px-1">
-        For you
-      </p>
-      <div className="space-y-3 mb-6">
-        <SuggestionRow
-          icon={Scale}
-          title={`Log ${activePet.name}'s weight`}
-          hint="18 days since last entry"
-          onClick={onOpenWeight}
-        />
-        <SuggestionRow
-          icon={Sparkles}
-          title="Weekly insights"
-          hint={isPremium ? "New summary ready" : "Mood, food & health patterns"}
-          onClick={isPremium ? onOpenInsights : onUpgrade}
-          premium={!isPremium}
-        />
-      </div>
+      {/* For-you suggestions moved to Care to keep Today focused on what's needed now. */}
 
       {/* EMERGENCY VET — pinned safety footer */}
       <motion.button
