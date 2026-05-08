@@ -37,6 +37,7 @@ interface SmartCaptureScreenProps {
   onUpgrade: () => void;
   followUpFor?: string | null;
   onClearFollowUp?: () => void;
+  onFirstAiResult?: () => void;
 }
 
 type Phase = "consent" | "pick" | "analyzing" | "uncertain" | "result" | "gated";
