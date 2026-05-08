@@ -206,20 +206,23 @@ const TodayScreen = ({
         </>
       )}
 
-      {/* FOR YOU — small low-contrast suggestion chips */}
+      {/* FOR YOU — actionable rows */}
       <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 mt-3 px-1">
         For you
       </p>
-      <div className="space-y-2 mb-6">
-        <SuggestionChip
+      <div className="space-y-3 mb-6">
+        <SuggestionRow
           icon={Scale}
-          label={`Log ${activePet.name}'s weight — 18 days since last entry`}
+          title={`Log ${activePet.name}'s weight`}
+          hint="18 days since last entry"
           onClick={onOpenWeight}
         />
-        <SuggestionChip
+        <SuggestionRow
           icon={Sparkles}
-          label={isPremium ? "Your weekly insight is ready" : "Unlock weekly insights"}
+          title="Weekly insights"
+          hint={isPremium ? "New summary ready" : "Mood, food & health patterns"}
           onClick={isPremium ? onOpenInsights : onUpgrade}
+          premium={!isPremium}
         />
       </div>
 
