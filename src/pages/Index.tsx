@@ -21,7 +21,7 @@ import ReferralScreen from "@/components/petia/account/ReferralScreen";
 import LegalScreen from "@/components/petia/account/LegalScreen";
 import BottomNav from "@/components/petia/BottomNav";
 import SplashScreen from "@/components/petia/SplashScreen";
-import PetSwitcher from "@/components/petia/pet/PetSwitcher";
+import PetSwitcherSheet from "@/components/petia/PetSwitcherSheet";
 import type { Pet } from "@/components/petia/FloatingBubble";
 import { MOCK_PETS } from "@/lib/mockData";
 import { AppSettingsProvider } from "@/lib/appSettings";
@@ -175,9 +175,9 @@ const Inner = () => {
           </AnimatePresence>
           <AnimatePresence>
             {showSwitcher && (
-              <PetSwitcher
+              <PetSwitcherSheet
                 pets={MOCK_PETS}
-                activePet={activePet}
+                activePetId={String(activePet.id)}
                 onSelect={handleSwitchPet}
                 onLongPress={(p) => { setShowSwitcher(false); setProfileSheet(p); }}
                 onAddPet={() => { setShowSwitcher(false); openPaywall(); }}
