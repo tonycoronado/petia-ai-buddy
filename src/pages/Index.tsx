@@ -196,6 +196,7 @@ const Inner = () => {
                 onUpgrade={openPaywall}
                 followUpFor={followUpFor}
                 onClearFollowUp={() => setFollowUpFor(null)}
+                onFirstAiResult={triggerDeferredTrialOffer}
               />
             )}
             {!subScreen && tab === "care" && (
