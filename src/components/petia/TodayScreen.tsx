@@ -100,7 +100,48 @@ const TodayScreen = ({
       exit={{ opacity: 0 }}
       className="pt-12 px-6 pb-32 overflow-y-auto"
     >
-      <PetHeader activePet={activePet} onTapPet={onTapPet} subtitle="Today for" />
+      <PetHeader
+        activePet={activePet}
+        onTapPet={onTapPet}
+        subtitle="Today for"
+        size="lg"
+        status={
+          heroKind === "overdue"
+            ? "Has something overdue"
+            : heroKind === "due"
+            ? `${dueToday.length} item${dueToday.length === 1 ? "" : "s"} today`
+            : heroKind === "followup"
+            ? "1 health follow-up"
+            : "All set today 🐾"
+        }
+      />
+
+      {trialActive && !trialBannerDismissed && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass rounded-3xl p-3 shadow-soft mb-4 flex items-center gap-3 border border-primary/20"
+        >
+          <div className="w-9 h-9 rounded-2xl gradient-cta flex items-center justify-center text-primary-foreground shadow-glow shrink-0">
+            <Sparkles size={16} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-black text-foreground text-xs leading-tight">
+              {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} of Petia PRO left
+            </p>
+            <p className="text-[10px] text-muted-foreground font-medium truncate">
+              Enjoying the premium helpers? Manage anytime in Account.
+            </p>
+          </div>
+          <button
+            onClick={() => setTrialBannerDismissed(true)}
+            aria-label="Dismiss"
+            className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground"
+          >
+            <X size={14} />
+          </button>
+        </motion.div>
+      )}
 
       <h1 className="text-4xl font-black tracking-tight text-foreground mb-1">Today</h1>
       <p className="text-sm text-muted-foreground font-medium mb-6">{subline}</p>
