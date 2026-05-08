@@ -18,7 +18,7 @@ interface ChatScreenProps {
 
 const FREE_LIMIT = 3;
 
-const ChatScreen = ({ pet, onUpgrade }: ChatScreenProps) => {
+const ChatScreen = ({ pet, onUpgrade, onBack }: ChatScreenProps) => {
   const { isPremium } = useAppSettings();
   const details = PET_DETAILS[String(pet.id)];
   const ctxLine = details
