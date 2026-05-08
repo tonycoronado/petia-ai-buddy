@@ -70,7 +70,7 @@ const RECENT: Array<{
     date: "Apr 2",
     status: "On track",
     tone: "bg-secondary text-foreground",
-    thumb: "https://images.unsplash.com/photo-1558944351-c2c0e9bbb15c?auto=format&fit=crop&q=80&w=160",
+    thumb: "https://images.unsplash.com/photo-1571566882372-1598d88abd90?auto=format&fit=crop&q=80&w=160",
   },
   {
     id: "r4",
