@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Smile, Zap, Heart, Meh, Frown,
-  Bell, Sparkles, ChevronRight, Siren, Lightbulb,
+  Bell, Sparkles, ChevronRight, Siren, Lightbulb, Scale,
 } from "lucide-react";
 import { triggerHaptic } from "@/lib/haptic";
 import { MOCK_REMINDERS } from "@/lib/mockData";
@@ -19,6 +19,7 @@ interface TodayScreenProps {
   onOpenDiary: () => void;
   onOpenWeight: () => void;
   onOpenMoodHistory: () => void;
+  onOpenFollowUp: () => void;
   onUpgrade: () => void;
 }
 
@@ -27,7 +28,7 @@ const MOODS = [
   { id: "happy", icon: Smile, label: "Happy" },
   { id: "normal", icon: Heart, label: "Normal" },
   { id: "quiet", icon: Meh, label: "Quiet" },
-  { id: "lethargic", icon: Frown, label: "Low" },
+  { id: "lethargic", icon: Frown, label: "Lethargic" },
 ];
 
 const TodayScreen = ({
@@ -38,6 +39,7 @@ const TodayScreen = ({
   onOpenDiary,
   onOpenWeight,
   onOpenMoodHistory,
+  onOpenFollowUp,
   onUpgrade,
 }: TodayScreenProps) => {
   const { isPremium } = useAppSettings();
@@ -54,9 +56,32 @@ const TodayScreen = ({
   const dueToday = MOCK_REMINDERS.filter(
     (r) => r.petId === petId && !r.done && (r.due.startsWith("Today") || r.overdue)
   );
+  const overdue = dueToday.find((r) => r.overdue);
   const nextReminder = dueToday[0];
-  const followUp = true; // mock: 1 monitoring entry exists in diary
-  const attentionCount = (nextReminder ? 1 : 0) + (followUp ? 1 : 0);
+  const followUpOpen = true; // mock: 1 monitoring entry exists in diary
+
+  // Hero priority: overdue > due today > follow-up > all clear
+  type HeroKind = "overdue" | "due" | "followup" | "clear";
+  const heroKind: HeroKind = overdue
+    ? "overdue"
+    : nextReminder
+    ? "due"
+    : followUpOpen
+    ? "followup"
+    : "clear";
+
+  const subline =
+    heroKind === "overdue"
+      ? `${activePet.name} has something overdue.`
+      : heroKind === "due"
+      ? `One thing for ${activePet.name} today.`
+      : heroKind === "followup"
+      ? `One health item to re-check.`
+      : `${activePet.name} is all set.`;
+
+  // Secondary "needs attention" rows = remaining items not in hero
+  const remaining = dueToday.filter((r) => r.id !== nextReminder?.id);
+  const showFollowUpRow = followUpOpen && heroKind !== "followup";
 
   const handleEmergency = () => {
     window.open(
@@ -77,13 +102,19 @@ const TodayScreen = ({
       <PetHeader activePet={activePet} onTapPet={onTapPet} subtitle="Today for" />
 
       <h1 className="text-4xl font-black tracking-tight text-foreground mb-1">Today</h1>
-      <p className="text-sm text-muted-foreground font-medium mb-6">
-        {attentionCount === 0
-          ? `${activePet.name} is all good.`
-          : `${attentionCount} thing${attentionCount === 1 ? "" : "s"} to look at.`}
-      </p>
+      <p className="text-sm text-muted-foreground font-medium mb-6">{subline}</p>
 
-      {/* Mood card */}
+      {/* HERO ZONE — single most important thing */}
+      <Hero
+        kind={heroKind}
+        petName={activePet.name}
+        reminderTitle={nextReminder?.title}
+        reminderDue={nextReminder?.due}
+        onOpenReminders={onOpenReminders}
+        onOpenFollowUp={onOpenFollowUp}
+      />
+
+      {/* DAILY MOOD */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -114,8 +145,8 @@ const TodayScreen = ({
                   selectedMood === m.id ? "bg-primary/10 scale-110" : "hover:bg-muted"
                 }`}
               >
-                <m.icon size={24} className="text-foreground" />
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                <m.icon size={22} className="text-foreground" />
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
                   {m.label}
                 </span>
               </motion.button>
@@ -123,101 +154,76 @@ const TodayScreen = ({
           </div>
         ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-3">
-            <span className="text-2xl mb-2 block">✨</span>
             <p className="font-bold text-foreground text-sm">Mood logged</p>
             <p className="text-xs text-muted-foreground mt-1">Check back tomorrow.</p>
           </motion.div>
         )}
       </motion.div>
 
-      {/* Next reminder */}
-      {nextReminder && (
-        <motion.button
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          onClick={onOpenReminders}
-          className="w-full glass rounded-4xl p-5 shadow-soft mb-4 flex items-center gap-4 text-left"
-        >
-          <div className="w-11 h-11 rounded-2xl bg-warning flex items-center justify-center text-warning-foreground shrink-0">
-            <Bell size={18} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black text-warning-foreground uppercase tracking-widest">
-              {nextReminder.overdue ? "Overdue" : "Due today"}
-            </p>
-            <p className="font-black text-foreground text-sm truncate">{nextReminder.title}</p>
-            <p className="text-[11px] text-muted-foreground font-medium">{nextReminder.due}</p>
-          </div>
-          <ChevronRight size={16} className="text-muted-foreground" />
-        </motion.button>
-      )}
-
-      {/* Health follow-up */}
-      {followUp && (
-        <motion.button
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          onClick={onOpenDiary}
-          className="w-full glass rounded-4xl p-5 shadow-soft mb-4 flex items-center gap-4 text-left"
-        >
-          <div className="w-11 h-11 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
-            <Heart size={18} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">
-              Follow-up
-            </p>
-            <p className="font-black text-foreground text-sm truncate">
-              Re-check the spot behind the left ear
-            </p>
-            <p className="text-[11px] text-muted-foreground font-medium">
-              Last photo Apr 6 · take a follow-up
-            </p>
-          </div>
-          <ChevronRight size={16} className="text-muted-foreground" />
-        </motion.button>
-      )}
-
-      {/* Weekly insight */}
-      <motion.button
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        onClick={isPremium ? onOpenInsights : onUpgrade}
-        className="w-full glass rounded-4xl p-5 shadow-soft mb-4 flex items-center gap-4 text-left border border-primary/15"
-      >
-        <div className="w-11 h-11 rounded-2xl gradient-cta flex items-center justify-center shadow-glow shrink-0">
-          <Sparkles size={18} className="text-primary-foreground" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-black text-foreground text-sm">Weekly insight</p>
-          <p className="text-[11px] text-muted-foreground font-medium truncate">
-            {isPremium ? "Mood trending positive · 1 health item" : "Premium · unlock"}
+      {/* NEEDS ATTENTION — only when more than the hero */}
+      {(remaining.length > 0 || showFollowUpRow) && (
+        <>
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 mt-2 px-1">
+            Needs attention
           </p>
-        </div>
-        <ChevronRight size={16} className="text-muted-foreground" />
-      </motion.button>
+          <div className="space-y-2 mb-4">
+            {remaining.map((r) => (
+              <button
+                key={r.id}
+                onClick={onOpenReminders}
+                className="w-full glass rounded-3xl p-4 shadow-soft flex items-center gap-3 text-left"
+              >
+                <div className="w-9 h-9 rounded-2xl bg-secondary flex items-center justify-center text-foreground shrink-0">
+                  <Bell size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-foreground text-sm truncate">{r.title}</p>
+                  <p className="text-[11px] text-muted-foreground font-medium">{r.due}</p>
+                </div>
+                <ChevronRight size={14} className="text-muted-foreground" />
+              </button>
+            ))}
+            {showFollowUpRow && (
+              <button
+                onClick={onOpenFollowUp}
+                className="w-full glass rounded-3xl p-4 shadow-soft flex items-center gap-3 text-left"
+              >
+                <div className="w-9 h-9 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
+                  <Heart size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-foreground text-sm truncate">
+                    Re-check spot behind left ear
+                  </p>
+                  <p className="text-[11px] text-muted-foreground font-medium">
+                    Last photo Apr 6 · take a follow-up
+                  </p>
+                </div>
+                <ChevronRight size={14} className="text-muted-foreground" />
+              </button>
+            )}
+          </div>
+        </>
+      )}
 
-      {/* Suggested next action */}
-      <motion.button
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        onClick={onOpenWeight}
-        className="w-full glass rounded-3xl p-4 shadow-soft mb-6 flex items-center gap-3 text-left"
-      >
-        <div className="w-9 h-9 rounded-2xl bg-secondary flex items-center justify-center text-foreground shrink-0">
-          <Lightbulb size={16} />
-        </div>
-        <p className="text-xs text-foreground font-bold flex-1">
-          Log {activePet.name}'s weight — 18 days since last entry
-        </p>
-        <ChevronRight size={14} className="text-muted-foreground" />
-      </motion.button>
+      {/* FOR YOU — small low-contrast suggestion chips */}
+      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 mt-3 px-1">
+        For you
+      </p>
+      <div className="space-y-2 mb-6">
+        <SuggestionChip
+          icon={Scale}
+          label={`Log ${activePet.name}'s weight — 18 days since last entry`}
+          onClick={onOpenWeight}
+        />
+        <SuggestionChip
+          icon={Sparkles}
+          label={isPremium ? "Your weekly insight is ready" : "Unlock weekly insights"}
+          onClick={isPremium ? onOpenInsights : onUpgrade}
+        />
+      </div>
 
-      {/* Emergency vet */}
+      {/* EMERGENCY VET — pinned safety footer */}
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={handleEmergency}
@@ -236,5 +242,110 @@ const TodayScreen = ({
     </motion.div>
   );
 };
+
+const Hero = ({
+  kind,
+  petName,
+  reminderTitle,
+  reminderDue,
+  onOpenReminders,
+  onOpenFollowUp,
+}: {
+  kind: "overdue" | "due" | "followup" | "clear";
+  petName: string;
+  reminderTitle?: string;
+  reminderDue?: string;
+  onOpenReminders: () => void;
+  onOpenFollowUp: () => void;
+}) => {
+  if (kind === "clear") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-5xl p-6 mb-4 gradient-cta shadow-glow text-primary-foreground"
+      >
+        <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">
+          All clear
+        </p>
+        <p className="font-black text-2xl leading-tight">Nothing urgent today</p>
+        <p className="text-xs font-medium opacity-85 mt-2">
+          Log a mood or capture a photo to keep {petName}'s record fresh.
+        </p>
+      </motion.div>
+    );
+  }
+  if (kind === "followup") {
+    return (
+      <motion.button
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={onOpenFollowUp}
+        className="w-full text-left rounded-5xl p-6 mb-4 gradient-accent shadow-glow text-primary-foreground"
+      >
+        <p className="text-[10px] font-black uppercase tracking-widest opacity-85 mb-1">
+          Health follow-up
+        </p>
+        <p className="font-black text-xl leading-tight">
+          Re-check the spot behind the left ear
+        </p>
+        <p className="text-xs font-medium opacity-90 mt-2">
+          Last photo Apr 6 · add a follow-up via Capture
+        </p>
+        <span className="inline-flex items-center gap-1 mt-4 px-3 py-2 rounded-2xl bg-white/20 backdrop-blur text-[11px] font-black uppercase tracking-widest">
+          Add follow-up <ChevronRight size={12} />
+        </span>
+      </motion.button>
+    );
+  }
+  // due / overdue
+  const isOver = kind === "overdue";
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onOpenReminders}
+      className={`w-full text-left rounded-5xl p-6 mb-4 shadow-glow ${
+        isOver
+          ? "bg-destructive text-destructive-foreground"
+          : "gradient-cta text-primary-foreground"
+      }`}
+    >
+      <div className="flex items-center gap-2 mb-1">
+        <Bell size={14} className="opacity-90" />
+        <p className="text-[10px] font-black uppercase tracking-widest opacity-85">
+          {isOver ? "Overdue" : "Due today"}
+        </p>
+      </div>
+      <p className="font-black text-2xl leading-tight">{reminderTitle}</p>
+      <p className="text-xs font-medium opacity-90 mt-2">{reminderDue}</p>
+      <span className="inline-flex items-center gap-1 mt-4 px-3 py-2 rounded-2xl bg-white/20 backdrop-blur text-[11px] font-black uppercase tracking-widest">
+        Mark done <ChevronRight size={12} />
+      </span>
+    </motion.button>
+  );
+};
+
+const SuggestionChip = ({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: any;
+  label: string;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className="w-full rounded-3xl p-3 bg-muted/60 flex items-center gap-3 text-left"
+  >
+    <div className="w-8 h-8 rounded-2xl bg-background/70 flex items-center justify-center text-foreground/70 shrink-0">
+      <Icon size={14} />
+    </div>
+    <p className="text-xs text-foreground/80 font-medium flex-1">{label}</p>
+  </button>
+);
 
 export default TodayScreen;
