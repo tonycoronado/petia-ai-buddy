@@ -42,7 +42,8 @@ const TodayScreen = ({
   onOpenFollowUp,
   onUpgrade,
 }: TodayScreenProps) => {
-  const { isPremium } = useAppSettings();
+  const { isPremium, trialActive, trialDaysLeft } = useAppSettings();
+  const [trialBannerDismissed, setTrialBannerDismissed] = useState(false);
   const [moodLogged, setMoodLogged] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
 
