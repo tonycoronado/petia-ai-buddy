@@ -454,6 +454,7 @@ const SmartCaptureScreen = ({
                 const label = followUpFor && kind === "health" ? "Follow-up" : CAPTURE_LABEL[kind];
                 toast.success(`${label} saved to ${activePet.name}'s history`);
                 if (followUpFor) onClearFollowUp?.();
+                onFirstAiResult?.();
                 reset();
               }}
               onDiscard={reset}
