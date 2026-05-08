@@ -24,16 +24,17 @@ interface Photo {
 
 interface Props {
   petName: string;
-  mode: "onboarding" | "profile";
+  mode: "onboarding" | "profile" | "library";
   onBack?: () => void;
   onSkip: () => void;
   onComplete: (counts: { visits: number; reminders: number }) => void;
+  onAddViaCapture?: () => void;
 }
 
-type Phase = "pick" | "analyzing" | "review" | "empty";
+type Phase = "library" | "pick" | "analyzing" | "review" | "empty";
 
-const ImportVetRecordsScreen = ({ petName, mode, onBack, onSkip, onComplete }: Props) => {
-  const [phase, setPhase] = useState<Phase>("pick");
+const ImportVetRecordsScreen = ({ petName, mode, onBack, onSkip, onComplete, onAddViaCapture }: Props) => {
+  const [phase, setPhase] = useState<Phase>(mode === "library" ? "library" : "pick");
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [result, setResult] = useState<OcrResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
