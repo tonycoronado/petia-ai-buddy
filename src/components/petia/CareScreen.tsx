@@ -90,6 +90,14 @@ const CareScreen = ({
           hint="Review what's scheduled for today"
           onClick={onOpenReminders}
         />
+        {onOpenWeight && (
+          <Row
+            icon={Scale}
+            title={`Log ${activePet.name}'s weight`}
+            hint="Track changes month over month"
+            onClick={onOpenWeight}
+          />
+        )}
       </div>
 
       {/* HELPERS — premium */}
