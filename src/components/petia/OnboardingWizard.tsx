@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import StepWelcome from "./onboarding/StepWelcome";
-import StepName from "./onboarding/StepName";
-import StepSpecies from "./onboarding/StepSpecies";
-import StepAge from "./onboarding/StepAge";
-import StepWeight from "./onboarding/StepWeight";
+import StepBasics from "./onboarding/StepBasics";
+import StepAgeWeight from "./onboarding/StepAgeWeight";
 import StepPhoto from "./onboarding/StepPhoto";
+import StepHealthContext from "./onboarding/StepHealthContext";
 import StepAIConsent from "./onboarding/StepAIConsent";
-import StepAuth from "./onboarding/StepAuth";
+import StepPermissions from "./onboarding/StepPermissions";
+import StepReady from "./onboarding/StepReady";
 
 export interface PetData {
   name: string;
@@ -20,6 +20,8 @@ export interface PetData {
   weightValue: number;
   photoUrl: string | null;
   photoFile: File | null;
+  health: string[];
+  healthNote: string;
 }
 
 interface OnboardingWizardProps {
@@ -41,30 +43,41 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
     breed: "",
     ageRange: "adult",
     weightRange: "medium",
-    weightValue: 25,
+    weightValue: 15,
     photoUrl: null,
     photoFile: null,
+    health: [],
+    healthNote: "",
   });
 
-  // 0 Welcome, 1 Name, 2 Species, 3 Age, 4 Weight, 5 Photo, 6 AIConsent, 7 Auth
+  // 0 Welcome, 1 Basics, 2 Age+Weight, 3 Photo, 4 Health, 5 AI, 6 Permissions, 7 Ready
   const TOTAL = 8;
   const progress = ((step + 1) / TOTAL) * 100;
 
-  const next = useCallback(
-    () => {
-      setDirection(1);
-      setStep((s) => Math.min(s + 1, TOTAL - 1));
-    },
-    []
-  );
+  const next = useCallback(() => {
+    setDirection(1);
+    setStep((s) => {
+      if (s + 1 >= TOTAL) {
+        onComplete(petData);
+        return s;
+      }
+      return s + 1;
+    });
+  }, [petData, onComplete]);
+
+  const finish = useCallback(() => onComplete(petData), [petData, onComplete]);
+
   const back = useCallback(() => {
     setDirection(-1);
     setStep((s) => Math.max(s - 1, 0));
   }, []);
-  const update = useCallback((p: Partial<PetData>) => setPetData((d) => ({ ...d, ...p })), []);
+  const update = useCallback(
+    (p: Partial<PetData>) => setPetData((d) => ({ ...d, ...p })),
+    []
+  );
 
-  // No back on Welcome (0) and Auth (last)
-  const showBack = step > 0 && step !== TOTAL - 1;
+  const showBack = step > 0 && step < TOTAL - 1;
+  const isOptional = step === 2 || step === 3 || step === 4; // age+weight, photo, health
 
   const wrap = (key: string, content: React.ReactNode) => (
     <motion.div
@@ -89,7 +102,7 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
       className="fixed inset-0 z-[100] bg-background flex flex-col"
     >
       <div className="px-6 pt-12 pb-2 flex items-center gap-3">
-        {showBack && (
+        {showBack ? (
           <motion.button
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
@@ -98,25 +111,36 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
           >
             <ChevronLeft size={22} className="text-foreground" />
           </motion.button>
+        ) : (
+          <div className="w-9" />
         )}
         <div className="flex-1">
           <Progress value={progress} className="h-1.5 bg-muted" />
         </div>
-        <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase whitespace-nowrap">
-          {step + 1}/{TOTAL}
-        </span>
+        {isOptional ? (
+          <button
+            onClick={next}
+            className="text-[11px] font-bold text-muted-foreground tracking-widest uppercase whitespace-nowrap"
+          >
+            Skip
+          </button>
+        ) : (
+          <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase whitespace-nowrap">
+            {step + 1}/{TOTAL}
+          </span>
+        )}
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 overflow-y-auto py-6">
         <AnimatePresence mode="wait" custom={direction}>
           {step === 0 && wrap("welcome", <StepWelcome next={next} />)}
-          {step === 1 && wrap("name", <StepName petData={petData} update={update} next={next} />)}
-          {step === 2 && wrap("species", <StepSpecies petData={petData} update={update} next={next} />)}
-          {step === 3 && wrap("age", <StepAge petData={petData} update={update} next={next} />)}
-          {step === 4 && wrap("weight", <StepWeight petData={petData} update={update} next={next} />)}
-          {step === 5 && wrap("photo", <StepPhoto petData={petData} update={update} next={next} />)}
-          {step === 6 && wrap("ai", <StepAIConsent next={next} />)}
-          {step === 7 && wrap("auth", <StepAuth petData={petData} onComplete={onComplete} />)}
+          {step === 1 && wrap("basics", <StepBasics petData={petData} update={update} next={next} />)}
+          {step === 2 && wrap("agewt", <StepAgeWeight petData={petData} update={update} next={next} />)}
+          {step === 3 && wrap("photo", <StepPhoto petData={petData} update={update} next={next} />)}
+          {step === 4 && wrap("health", <StepHealthContext petData={petData} update={update} next={next} />)}
+          {step === 5 && wrap("ai", <StepAIConsent next={next} />)}
+          {step === 6 && wrap("perm", <StepPermissions next={next} />)}
+          {step === 7 && wrap("ready", <StepReady petData={petData} next={finish} />)}
         </AnimatePresence>
       </div>
     </motion.div>
