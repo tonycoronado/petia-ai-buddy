@@ -112,11 +112,21 @@ const HealthScreen = ({
       exit={{ opacity: 0 }}
       className="pt-12 px-6 pb-32 min-h-screen"
     >
-      <PetHeader activePet={activePet} onTapPet={onTapPet} subtitle="Health for" />
+      <PetHeader
+        activePet={activePet}
+        onTapPet={onTapPet}
+        subtitle="Health for"
+        size="lg"
+        status={
+          latestKg
+            ? `${latestKg.toFixed(1)} kg · last vet ${lastVet?.date.split(",")[0] ?? "—"}`
+            : "No health entries yet"
+        }
+      />
 
       <h1 className="text-3xl font-black tracking-tight text-foreground mb-1">Health</h1>
       <p className="text-sm text-muted-foreground font-medium mb-6">
-        {activePet.name}'s health history.
+        {activePet.name}'s full record, in one timeline.
       </p>
 
       {/* Quick stats strip */}
@@ -126,10 +136,30 @@ const HealthScreen = ({
         <StatTile label="Records" value={String(recordsCount)} />
       </div>
 
-      {/* Recent activity preview */}
-      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 px-1">
-        Recent activity
-      </p>
+      {/* Pet Timeline (recent) */}
+      <div className="flex items-center justify-between mb-2 px-1">
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+          Pet timeline
+        </p>
+        <button
+          onClick={onOpenDiary}
+          className="text-[10px] font-black text-primary uppercase tracking-widest"
+        >
+          See all
+        </button>
+      </div>
+      <div className="flex gap-1.5 mb-3 overflow-x-auto no-scrollbar -mx-1 px-1">
+        {["All", "Health", "Vet", "Weight", "Mood"].map((c, i) => (
+          <button
+            key={c}
+            className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap min-h-[32px] ${
+              i === 0 ? "gradient-cta text-primary-foreground shadow-glow" : "glass-ghost text-foreground"
+            }`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
       <div className="space-y-2 mb-6">
         {RECENT.map((r) => (
           <button
