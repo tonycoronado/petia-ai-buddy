@@ -113,8 +113,8 @@ const Inner = () => {
     return () => clearTimeout(t);
   }, []);
 
-  const openPaywall = (reason?: string) => {
-    setPaywallReason(reason);
+  const openPaywall = (reason?: unknown) => {
+    setPaywallReason(typeof reason === "string" ? reason : undefined);
     setShowPaywall(true);
   };
 
