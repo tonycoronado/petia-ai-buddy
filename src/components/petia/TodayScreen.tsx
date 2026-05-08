@@ -227,18 +227,18 @@ const TodayScreen = ({
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={handleEmergency}
-        className="w-full glass rounded-3xl p-4 shadow-soft flex items-center gap-3"
+        className="w-full rounded-3xl p-4 shadow-glow flex items-center gap-3 bg-destructive text-destructive-foreground"
       >
-        <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground/70 shrink-0">
+        <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-destructive-foreground shrink-0">
           <Siren size={18} />
         </div>
         <div className="flex-1 text-left">
-          <p className="font-black text-foreground text-sm">Emergency vet</p>
-          <p className="text-[11px] text-muted-foreground font-medium">
+          <p className="font-black text-sm">Emergency vet</p>
+          <p className="text-[11px] font-medium opacity-90">
             Find the nearest 24/7 clinic
           </p>
         </div>
-        <ChevronRight size={16} className="text-muted-foreground" />
+        <ChevronRight size={16} className="opacity-90" />
       </motion.button>
     </motion.div>
   );
