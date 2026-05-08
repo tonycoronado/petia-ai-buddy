@@ -72,9 +72,9 @@ const TodayScreen = ({
 
   const subline =
     heroKind === "overdue"
-      ? `${activePet.name} has something overdue.`
+      ? `Start with what's overdue.`
       : heroKind === "due"
-      ? `One thing for ${activePet.name} today.`
+      ? `Top priority for ${activePet.name} today.`
       : heroKind === "followup"
       ? `One health item to re-check.`
       : `${activePet.name} is all set.`;
@@ -227,17 +227,18 @@ const TodayScreen = ({
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={handleEmergency}
-        className="w-full glass rounded-3xl p-4 shadow-soft flex items-center gap-3 border border-destructive/20"
+        className="w-full glass rounded-3xl p-4 shadow-soft flex items-center gap-3"
       >
-        <div className="w-10 h-10 rounded-2xl bg-destructive/10 flex items-center justify-center text-destructive shrink-0">
+        <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground/70 shrink-0">
           <Siren size={18} />
         </div>
         <div className="flex-1 text-left">
           <p className="font-black text-foreground text-sm">Emergency vet</p>
           <p className="text-[11px] text-muted-foreground font-medium">
-            One tap to nearest 24/7 clinic
+            Find the nearest 24/7 clinic
           </p>
         </div>
+        <ChevronRight size={16} className="text-muted-foreground" />
       </motion.button>
     </motion.div>
   );

@@ -107,6 +107,10 @@ const SmartCaptureScreen = ({
     setPhase("analyzing");
     setTimeout(() => {
       const { kind: k } = classifyCapture(forced);
+      // realistic AI pause
+    }, 0);
+    setTimeout(() => {
+      const { kind: k } = classifyCapture(forced);
       if (k === "uncertain") {
         setPhase("uncertain");
       } else {
