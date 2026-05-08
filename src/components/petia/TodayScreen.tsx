@@ -332,24 +332,40 @@ const Hero = ({
   );
 };
 
-const SuggestionChip = ({
+const SuggestionRow = ({
   icon: Icon,
-  label,
+  title,
+  hint,
   onClick,
+  premium,
 }: {
   icon: any;
-  label: string;
+  title: string;
+  hint: string;
   onClick: () => void;
+  premium?: boolean;
 }) => (
-  <button
+  <motion.button
+    whileTap={{ scale: 0.97 }}
     onClick={onClick}
-    className="w-full rounded-3xl p-3 bg-muted/60 flex items-center gap-3 text-left"
+    className="w-full glass rounded-4xl p-5 shadow-soft flex items-center gap-4 text-left"
   >
-    <div className="w-8 h-8 rounded-2xl bg-background/70 flex items-center justify-center text-foreground/70 shrink-0">
-      <Icon size={14} />
+    <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center text-foreground shrink-0">
+      <Icon size={20} />
     </div>
-    <p className="text-xs text-foreground/80 font-medium flex-1">{label}</p>
-  </button>
+    <div className="flex-1 min-w-0">
+      <p className="font-black text-foreground text-sm flex items-center gap-1.5">
+        {title}
+        {premium && (
+          <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">
+            Premium
+          </span>
+        )}
+      </p>
+      <p className="text-[11px] text-muted-foreground font-medium truncate">{hint}</p>
+    </div>
+    <ChevronRight size={16} className="text-muted-foreground" />
+  </motion.button>
 );
 
 export default TodayScreen;
