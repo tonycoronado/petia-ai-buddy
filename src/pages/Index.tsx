@@ -69,6 +69,13 @@ const Inner = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showSwitcher, setShowSwitcher] = useState(false);
+  const [followUpFor, setFollowUpFor] = useState<string | null>(null);
+
+  const goToCapture = (followUpId?: string) => {
+    setFollowUpFor(followUpId ?? null);
+    reset();
+    setTab("capture");
+  };
 
   useEffect(() => {
     const t = setTimeout(() => setSplashExit(true), 2000);
@@ -117,6 +124,7 @@ const Inner = () => {
                 onOpenDiary={() => push("diary")}
                 onOpenWeight={() => push("weight")}
                 onOpenMoodHistory={() => push("mood")}
+                onOpenFollowUp={() => goToCapture("d-1")}
                 onUpgrade={openPaywall}
               />
             )}
@@ -127,7 +135,9 @@ const Inner = () => {
                 onOpenDiary={() => push("diary")}
                 onOpenWeight={() => push("weight")}
                 onOpenVet={() => push("vet")}
+                onOpenRecords={() => push("records")}
                 onOpenPDF={() => push("pdf")}
+                onAddViaCapture={() => goToCapture()}
                 onUpgrade={openPaywall}
               />
             )}
@@ -137,7 +147,10 @@ const Inner = () => {
                 onTapPet={tapPet}
                 onOpenFullScanner={() => push("scanner")}
                 onOpenFullDiary={() => push("diary")}
-                onOpenFullImport={() => push("import")}
+                onOpenFullImport={() => push("records")}
+                onUpgrade={openPaywall}
+                followUpFor={followUpFor}
+                onClearFollowUp={() => setFollowUpFor(null)}
               />
             )}
             {!subScreen && tab === "care" && (
