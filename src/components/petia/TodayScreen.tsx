@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Smile, Zap, Heart, Meh, Frown,
-  Bell, Sparkles, ChevronRight, Siren, Lightbulb, Scale,
+  Bell, ChevronRight, Siren, Sparkles, X,
 } from "lucide-react";
 import { triggerHaptic } from "@/lib/haptic";
 import { MOCK_REMINDERS } from "@/lib/mockData";
