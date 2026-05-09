@@ -14,6 +14,7 @@ import {
   LogOut,
   Trash2,
   ChevronRight,
+  Moon,
 } from "lucide-react";
 import { useAppSettings } from "@/lib/appSettings";
 import { Switch } from "@/components/ui/switch";
