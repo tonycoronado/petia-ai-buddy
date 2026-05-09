@@ -133,7 +133,7 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
 
       <div className="flex-1 flex items-center justify-center px-6 overflow-y-auto py-6">
         <AnimatePresence mode="wait" custom={direction}>
-          {step === 0 && wrap("welcome", <StepWelcome next={next} skipAll={finish} />)}
+          {step === 0 && wrap("welcome", <StepWelcome next={next} />)}
           {step === 1 && wrap("basics", <StepBasics petData={petData} update={update} next={next} />)}
           {step === 2 && wrap("agewt", <StepAgeWeight petData={petData} update={update} next={next} />)}
           {step === 3 && wrap("photo", <StepPhoto petData={petData} update={update} next={next} />)}

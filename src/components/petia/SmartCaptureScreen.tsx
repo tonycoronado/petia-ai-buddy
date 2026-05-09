@@ -37,7 +37,6 @@ interface SmartCaptureScreenProps {
   onUpgrade: () => void;
   followUpFor?: string | null;
   onClearFollowUp?: () => void;
-  onFirstAiResult?: () => void;
 }
 
 type Phase = "consent" | "pick" | "analyzing" | "uncertain" | "result" | "gated";
@@ -65,7 +64,6 @@ const SmartCaptureScreen = ({
   onUpgrade,
   followUpFor,
   onClearFollowUp,
-  onFirstAiResult,
 }: SmartCaptureScreenProps) => {
   const { aiEnabled, setAiEnabled, isPremium } = useAppSettings();
   const [phase, setPhase] = useState<Phase>(aiEnabled ? "pick" : "consent");
@@ -267,30 +265,21 @@ const SmartCaptureScreen = ({
                 <span className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-primary-foreground/70 rounded-bl-lg" />
                 <span className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-primary-foreground/70 rounded-br-lg" />
               </div>
-              <p className="text-center text-muted-foreground text-sm font-medium max-w-[260px] mb-2">
+              <p className="text-center text-muted-foreground text-sm font-medium max-w-[260px] mb-6">
                 Show Petia anything — food, a concern, or a vet paper.
-              </p>
-              <p className="text-center text-[11px] text-muted-foreground/80 font-medium max-w-[240px] mb-6">
-                Tip: fit the subject inside the frame and keep it well-lit for best results.
               </p>
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={() => fileRef.current?.click()}
-                className="w-full py-4 gradient-cta text-primary-foreground rounded-3xl font-bold shadow-glow flex items-center justify-center gap-2 min-h-[44px]"
+                className="w-full py-4 gradient-cta text-primary-foreground rounded-3xl font-bold shadow-glow flex items-center justify-center gap-2"
               >
                 <Camera size={18} /> Take photo
               </motion.button>
               <button
                 onClick={() => fileRef.current?.click()}
-                className="mt-3 text-xs text-muted-foreground font-bold flex items-center gap-1.5 min-h-[44px]"
+                className="mt-3 text-xs text-muted-foreground font-bold flex items-center gap-1.5"
               >
                 <ImagePlus size={14} /> Upload from library
-              </button>
-              <button
-                onClick={onOpenFullDiary}
-                className="mt-1 text-[11px] font-black text-primary uppercase tracking-widest flex items-center gap-1 min-h-[44px]"
-              >
-                See past entries for {activePet.name} <ChevronRight size={12} />
               </button>
             </div>
 
@@ -463,7 +452,6 @@ const SmartCaptureScreen = ({
                 const label = followUpFor && kind === "health" ? "Follow-up" : CAPTURE_LABEL[kind];
                 toast.success(`${label} saved to ${activePet.name}'s history`);
                 if (followUpFor) onClearFollowUp?.();
-                onFirstAiResult?.();
                 reset();
               }}
               onDiscard={reset}

@@ -12,7 +12,7 @@ interface RemindersScreenProps {
   petId: string;
   petName: string;
   onBack: () => void;
-  onUpgrade: (reason?: string) => void;
+  onUpgrade: () => void;
 }
 
 const CATEGORIES: ReminderCategory[] = ["Vaccination", "Medication", "Deworming", "Grooming", "Vet Visit", "General"];
@@ -49,7 +49,7 @@ const RemindersScreen = ({ petId, petName, onBack, onUpgrade }: RemindersScreenP
     if (!newTitle.trim()) return;
     if (!isPremium && activeCount >= FREE_LIMIT) {
       toast.error("Free plan limited to 3 active reminders");
-      onUpgrade(`You're adding reminder #${activeCount + 1} for ${petName} — unlock unlimited reminders with Petia PRO.`);
+      onUpgrade();
       return;
     }
     setItems([

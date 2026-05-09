@@ -66,7 +66,6 @@ const Inner = () => {
   const [splashExit, setSplashExit] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [showTrialOffer, setShowTrialOffer] = useState(false);
-  const [trialOfferShown, setTrialOfferShown] = useState(false);
   const [onboardedName, setOnboardedName] = useState<string>("your pet");
   const [tab, setTab] = useState("today");
   const { current: subScreen, push, pop, reset } = useScreenStack<SubScreenId>();
@@ -81,23 +80,15 @@ const Inner = () => {
       img: data.photoUrl || prev.img,
       weight: data.weightValue ? `${data.weightValue.toFixed(1)}kg` : prev.weight,
     }));
-    // Defer trial offer — don't show it before user feels Petia's value
-    setHasOnboarded(true);
+    setShowTrialOffer(true);
   };
 
   const finishOnboarding = () => {
     setShowTrialOffer(false);
-    setTrialOfferShown(true);
-  };
-
-  const triggerDeferredTrialOffer = () => {
-    if (trialOfferShown) return;
-    setTrialOfferShown(true);
-    setTimeout(() => setShowTrialOffer(true), 800);
+    setHasOnboarded(true);
   };
   const [profileSheet, setProfileSheet] = useState<Pet | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
   const [showAccount, setShowAccount] = useState(false);
   const [showSwitcher, setShowSwitcher] = useState(false);
   const [followUpFor, setFollowUpFor] = useState<string | null>(null);
@@ -113,10 +104,7 @@ const Inner = () => {
     return () => clearTimeout(t);
   }, []);
 
-  const openPaywall = (reason?: unknown) => {
-    setPaywallReason(typeof reason === "string" ? reason : undefined);
-    setShowPaywall(true);
-  };
+  const openPaywall = () => setShowPaywall(true);
 
   const handleSwitchPet = (pet: Pet) => {
     if (String(pet.id) === String(activePet.id)) {
@@ -147,7 +135,7 @@ const Inner = () => {
       {showSplash && splashExit && <SplashExiter onDone={() => setShowSplash(false)} />}
 
       <AnimatePresence>
-        {!showSplash && !hasOnboarded && (
+        {!showSplash && !hasOnboarded && !showTrialOffer && (
           <OnboardingWizard onComplete={handleOnboardingComplete} />
         )}
       </AnimatePresence>
@@ -200,7 +188,6 @@ const Inner = () => {
                 onUpgrade={openPaywall}
                 followUpFor={followUpFor}
                 onClearFollowUp={() => setFollowUpFor(null)}
-                onFirstAiResult={triggerDeferredTrialOffer}
               />
             )}
             {!subScreen && tab === "care" && (
@@ -210,7 +197,6 @@ const Inner = () => {
                 onOpenReminders={() => push("reminders")}
                 onOpenInsights={() => push("insights")}
                 onOpenChat={() => push("chat")}
-                onOpenWeight={() => push("weight")}
                 onUpgrade={openPaywall}
               />
             )}
@@ -227,14 +213,14 @@ const Inner = () => {
             {subScreen === "records" && <ImportVetRecordsScreen petName={activePet.name} mode="library" onBack={() => pop()} onSkip={() => pop()} onComplete={() => pop()} onAddViaCapture={() => { pop(); goToCapture(); }} />}
             {subScreen === "insights" && <WeeklyInsightsScreen pet={activePet} onBack={() => pop()} onUpgrade={openPaywall} />}
             {subScreen === "pdf" && <PDFExportScreen petName={activePet.name} onBack={() => pop()} onUpgrade={openPaywall} />}
-            {subScreen === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} onBack={() => pop()} />}
+            {subScreen === "chat" && <ChatScreen pet={activePet} onUpgrade={openPaywall} />}
             {subScreen === "referral" && <ReferralScreen onBack={() => pop()} />}
             {subScreen === "terms" && <LegalScreen title="Terms of Service" body={TERMS} onBack={() => pop()} />}
             {subScreen === "privacy" && <LegalScreen title="Privacy Policy" body={PRIVACY} onBack={() => pop()} />}
           </AnimatePresence>
 
           <AnimatePresence>
-            {showPaywall && <PaywallScreen onClose={() => { setShowPaywall(false); setPaywallReason(undefined); }} reason={paywallReason} />}
+            {showPaywall && <PaywallScreen onClose={() => setShowPaywall(false)} />}
           </AnimatePresence>
           <AnimatePresence>
             {profileSheet && <PetProfileSheet pet={profileSheet} onClose={() => setProfileSheet(null)} />}

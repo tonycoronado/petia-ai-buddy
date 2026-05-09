@@ -6,7 +6,6 @@ import { useAppSettings } from "@/lib/appSettings";
 
 interface PaywallScreenProps {
   onClose: () => void;
-  reason?: string;
 }
 
 const FEATURES = [
@@ -19,7 +18,7 @@ const FEATURES = [
   "Vet Visit PDF Export",
 ];
 
-const PaywallScreen = ({ onClose, reason }: PaywallScreenProps) => {
+const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
   const { startTrial } = useAppSettings();
   const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
 
@@ -48,7 +47,7 @@ const PaywallScreen = ({ onClose, reason }: PaywallScreenProps) => {
           <h2 className="text-5xl font-black tracking-tighter relative text-foreground">Unlock<br />Petia PRO</h2>
         </div>
         <p className="text-muted-foreground font-medium text-sm mb-8 leading-relaxed">
-          {reason ?? "Give your pet the premium care they deserve. Less than a bag of treats per month."}
+          Give your pet the premium care they deserve. Less than a bag of treats per month.
         </p>
 
         <div className="space-y-3 mb-4">

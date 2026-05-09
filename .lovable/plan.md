@@ -1,68 +1,56 @@
-# Petia UX Polish — 9 Improvement Areas
+# Petia Onboarding v2 — Fast, Premium, Mobile
 
-Apply the senior-designer review across IA, onboarding, capture, pet model, premium, tone, accessibility, hierarchy, and scope. Keep brand, colors, typography, and tone unchanged.
+Scope: Wire onboarding into the app, refactor existing steps into the approved flow, and add three new screens (Health context, Permissions primer, Ready) + a soft trial offer reusing the existing Paywall. No brand, color, type, spacing, or IA changes.
 
-## 1. Information Architecture
-- Move **Capture** out of the tab list; render it as a raised circular FAB in the center notch of `BottomNav` (already partially the case — confirm 4 real tabs: Today, Health, Care, Account, with FAB in middle).
-- **De-duplicate** Today vs Care: Today shows only time-sensitive items (today's mood, due reminders, follow-ups, emergency, trial banner). Move "Weekly Insights" and "Log Weight" entry points to Care only (keep Today free of library shortcuts).
-- **Health → Pet Timeline**: unify Scans, Triage, Vet Docs, Weight, Mood into one chronological feed with type filter chips (All / Scan / Health / Vet / Weight / Mood). Existing detail screens remain reachable from rows.
+## Flow (9 steps + soft paywall)
 
-## 2. Onboarding
-- Slim down `StepWelcome`: one-line promise + single CTA (remove the 4 feature cards; surface those as empty-state nudges later).
-- Make `StepHealthContext` a single optional textarea ("Anything Petia should know? — optional") with a clear Skip.
-- Add a small "Just let me in" link on Welcome to skip wizard with safe defaults.
-- **Defer trial offer**: do not show `OnboardingTrialOffer` immediately after wizard. Set a flag and trigger it after the first AI "wow" (first scan or triage result).
+1. **Welcome** — keep `StepWelcome`, tighten copy: "Daily care, Smart Capture, reminders, and health history." CTA: Get started.
+2. **Pet basics** — merge `StepName` + `StepSpecies` into one screen `StepBasics`. Name input on top, Dog/Cat tile pair below. Single Continue.
+3. **Age & weight** — merge `StepAge` + `StepWeight` into `StepAgeWeight`. Age pills (Puppy/Young/Adult/Senior) + weight slider. Skip link in header.
+4. **Photo** — keep `StepPhoto`, copy emphasizes warmth ("Make Petia personal"). Skip link.
+5. **Health context** (new) — `StepHealthContext`. Multi-select chips: Allergies, Medical conditions, Medication, Sensitive stomach, Skin issues, None (None deselects others). Optional one-line note. Skip link.
+6. **AI consent** — keep `StepAIConsent`, trim copy. Two CTAs: Enable AI features (primary, gradient), Continue without AI (ghost). "View AI disclosure" opens a sonner toast naming Anthropic, Google, OpenAI + no-training note.
+7. **Permissions primer** (new) — `StepPermissions`. Two glass rows with icons: Camera & Photos (Smart Capture), Notifications (reminders). Single Continue. No native prompts in prototype.
+8. **Ready** (new) — `StepReady`. "Petia is ready for {name}." Pet photo (or initial bubble) + 4 glass rows: Track daily mood, Use Smart Capture, Set reminders, Keep health history. CTA: Open Petia.
+9. **Soft trial offer** (new) — `OnboardingTrialOffer` component. Reuses Paywall styling. Three options: 7-day Premium trial (default highlighted), Monthly, Annual (Save 33% pill). Personalized benefit list referencing pet name. Restore purchases link. **Continue free** clearly visible as equal-weight text button (not hidden, not tiny).
 
-## 3. Smart Capture
-- Add a **camera guidance overlay** (dashed frame + 1-line hint per mode: "Fit the label inside the frame").
-- Show a **confidence indicator** when classifier is unsure ("Looks like food, but blurry — confirm?") instead of a flat 3-choice fallback.
-- Add prominent **Retake** affordance after preview.
-- Add **"See past scans for {pet}"** shortcut linking to Pet Timeline filtered by Scan.
+After 9: trial → Today (premium flag mock); free → Today (free limits).
 
-## 4. Active Pet Header
-- Enlarge `PetHeader`: bigger photo (56–64px), pet name as headline, micro line beneath ("Happy today · 2 reminders"). Becomes the emotional anchor on Today, Health, Care.
+## UX rules applied
+- Progress bar shows 1/9…9/9 (already in wizard); hidden on Trial Offer.
+- Skip link top-right on steps 3, 4, 5.
+- Auth removed from onboarding (existing `StepAuth` is mock-only; the prototype is zero-backend per project memory). Account/sign-in stays in Account sheet as today.
+- One idea per screen; no forms longer than 2 fields.
+- Animations reuse the wizard's slide transition.
 
-## 5. Premium / Monetization
-- Standardize on a single Premium pattern: small `Premium` pill (no lock icons, no graying). Update all gates (RemindersScreen, WeeklyInsights, PDF export, ChatScreen, Expenses).
-- **Contextual paywall copy**: when free user hits 3-reminder cap, paywall opens with "You're adding reminder #4 — unlock unlimited" (pass a `reason` prop into `PaywallScreen`).
-- Add a small dismissable **Trial countdown banner** on Today ("4 days of Premium left").
+## Wiring (Index.tsx)
+- Add `useState` `hasOnboarded` (in-memory; defaults false on fresh load — prototype, no persistence required).
+- After splash, if `!hasOnboarded`, render `<OnboardingWizard onComplete={(data) => { setOnboardData(data); setShowTrialOffer(true); }} />`.
+- After wizard: render `<OnboardingTrialOffer onChoose={(plan) => { setHasOnboarded(true); /* mock premium if trial */ }} />`.
+- Then normal Today screen renders. Active pet swaps to onboarded pet name/photo (extend `MOCK_PETS[0]` shallow-merge for prototype).
 
-## 6. Emotional Tone (copy pass)
-- Rewrite empty states in pet-voice: e.g. "Bella hasn't told us how she's feeling today 🐾", "No scans yet — show Petia Bella's bowl."
-- Soften AI disclaimers: "Petia's a helper, not a vet — always check with your clinic for big stuff."
-- Add 1-line warm loading copy ("Petia's looking at this for {pet}…").
+## Files
 
-## 7. Accessibility
-- Food-safety scoring: add icon + text label alongside color (Good ✓ / Okay ! / Avoid ✕).
-- Audit touch targets to ≥44pt (BottomNav nav buttons, chip rows).
-- Ensure dynamic type via `text-*` not fixed px on body copy.
+**New**
+- `src/components/petia/onboarding/StepBasics.tsx`
+- `src/components/petia/onboarding/StepAgeWeight.tsx`
+- `src/components/petia/onboarding/StepHealthContext.tsx`
+- `src/components/petia/onboarding/StepPermissions.tsx`
+- `src/components/petia/onboarding/StepReady.tsx`
+- `src/components/petia/onboarding/OnboardingTrialOffer.tsx`
 
-## 8. Visual Hierarchy
-- Introduce **two glass weights** in `index.css`: `.glass` (primary, full opacity) and `.glass-ghost` (secondary, lower opacity, no shadow) — apply ghost to non-actionable info rows.
-- Apply consistent **4/8/16/24 spacing scale** by removing one-off `gap-3.5` / `p-5` arbitrary values across Today/Health/Care.
+**Edited**
+- `src/components/petia/OnboardingWizard.tsx` — new step order, TOTAL=9, extend `PetData` with `health: string[]`, `healthNote: string`, drop Auth step from sequence (file kept for now, not imported).
+- `src/components/petia/onboarding/StepWelcome.tsx` — tightened copy.
+- `src/components/petia/onboarding/StepAIConsent.tsx` — add secondary "Continue without AI" + disclosure toast.
+- `src/components/petia/onboarding/StepPhoto.tsx` — Skip link.
+- `src/pages/Index.tsx` — mount wizard + trial offer before main app; merge onboarded pet into active pet.
 
-## 9. Scope cuts
-- Hide **Referral** entry from Account behind a "More" section (defer surface area).
-- Reframe **Expenses** as "Vet costs" tied to Vet Visits only (auto-row from each visit + receipt photo via Capture); remove standalone categories UI for v1.
+**Untouched**
+- All branding, tokens, BottomNav, Today/Health/Capture/Care/Account screens, Paywall (referenced for visual parity only).
 
-## Technical Details
+## Visual conventions
+- Glass cards (`glass rounded-3xl shadow-soft`), gradient CTA (`gradient-cta text-primary-foreground`), `Sparkles`/`Camera`/`Bell`/`Heart` lucide icons. No new colors. No new fonts.
 
-Files to add/edit:
-- `src/components/petia/BottomNav.tsx` — confirm 4 tabs + center FAB; add Account tab.
-- `src/components/petia/TodayScreen.tsx` — strip Insights/Weight rows; add trial banner; pet-voice empty states.
-- `src/components/petia/CareScreen.tsx` — own Insights/Weight entry points.
-- `src/components/petia/HealthScreen.tsx` — replace cards with unified `PetTimeline` component + filter chips.
-- New: `src/components/petia/health/PetTimeline.tsx` (merges scans + triage + vet docs + weight + mood entries from mock data).
-- `src/components/petia/PetHeader.tsx` — larger photo + status line prop.
-- `src/components/petia/onboarding/StepWelcome.tsx` — slim version + skip link.
-- `src/components/petia/onboarding/StepHealthContext.tsx` — single optional textarea.
-- `src/pages/Index.tsx` — defer `OnboardingTrialOffer` until first AI result; pass trigger via context.
-- `src/components/petia/SmartCaptureScreen.tsx` — guidance overlay + confidence prompt + retake + history shortcut.
-- `src/components/petia/PaywallScreen.tsx` — accept `reason` prop; show contextual title.
-- `src/components/petia/RemindersScreen.tsx`, `WeeklyInsightsScreen.tsx`, `PDFExportScreen.tsx`, `ChatScreen.tsx` — unified Premium pill pattern + reason passthrough.
-- `src/index.css` — add `.glass-ghost` utility; (optional) trial-banner accent.
-- `src/lib/mockData.ts` — add unified timeline mock if not derivable.
-- `src/components/petia/EmptyState.tsx` and various screens — pet-voice copy pass.
-- `src/components/petia/account/AccountSheet.tsx` — move Referral under "More".
-
-No brand, color, or font changes. No new dependencies. All work frontend-only against mock data.
+## Out of scope
+- Real auth, real permission prompts, persistence, analytics, A/B copy variants, additional pet creation inside trial offer.

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Send, Sparkles } from "lucide-react";
+import { Send, Sparkles } from "lucide-react";
 import type { Pet } from "./FloatingBubble";
 import { PET_DETAILS } from "@/lib/mockData";
 import { useAppSettings } from "@/lib/appSettings";
@@ -13,12 +13,11 @@ interface Message {
 interface ChatScreenProps {
   pet: Pet;
   onUpgrade: () => void;
-  onBack?: () => void;
 }
 
 const FREE_LIMIT = 3;
 
-const ChatScreen = ({ pet, onUpgrade, onBack }: ChatScreenProps) => {
+const ChatScreen = ({ pet, onUpgrade }: ChatScreenProps) => {
   const { isPremium } = useAppSettings();
   const details = PET_DETAILS[String(pet.id)];
   const ctxLine = details
@@ -69,29 +68,16 @@ const ChatScreen = ({ pet, onUpgrade, onBack }: ChatScreenProps) => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col h-screen">
       <div className="pt-16 px-6 pb-4">
         <div className="flex items-center gap-3">
-          {onBack && (
-            <button
-              onClick={onBack}
-              aria-label="Back"
-              className="w-10 h-10 -ml-2 rounded-full glass shadow-soft flex items-center justify-center text-foreground shrink-0"
-            >
-              <ArrowLeft size={18} />
-            </button>
+          <h1 className="text-2xl font-black tracking-tight text-foreground">AI Care Assistant</h1>
+          {isPremium && (
+            <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full gradient-cta text-primary-foreground">
+              <Sparkles size={10} /> Priority
+            </span>
           )}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-foreground truncate">AI Care Assistant</h1>
-              {isPremium && (
-                <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full gradient-cta text-primary-foreground">
-                  <Sparkles size={10} /> Priority
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground font-medium mt-0.5 truncate">
-              Personalized for {pet.name} • {ctxLine}
-            </p>
-          </div>
         </div>
+        <p className="text-xs text-muted-foreground font-medium mt-0.5">
+          Personalized for {pet.name} • {ctxLine}
+        </p>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 space-y-4 pb-4 no-scrollbar">
