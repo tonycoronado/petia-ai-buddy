@@ -14,6 +14,7 @@ import {
   LogOut,
   Trash2,
   ChevronRight,
+  Moon,
 } from "lucide-react";
 import { useAppSettings } from "@/lib/appSettings";
 import { Switch } from "@/components/ui/switch";
@@ -57,6 +58,8 @@ const AccountSheet = ({
     trialDaysLeft,
     notifications,
     toggleNotification,
+    theme,
+    setTheme,
   } = useAppSettings();
 
   const Row = ({ icon: Icon, label, sub, onClick, right }: any) => (
@@ -176,6 +179,32 @@ const AccountSheet = ({
             onClick={() => toast.message("Petia uses Anthropic, Google and OpenAI for different AI features. Photos and data are never used to train models.")}
             right={<Switch checked={aiEnabled} onCheckedChange={setAiEnabled} />}
           />
+          <div className="flex items-center gap-4 px-1 py-3">
+            <div className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center text-foreground">
+              <Moon size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-foreground text-sm">Appearance</p>
+              <p className="text-[11px] text-muted-foreground font-medium truncate">
+                {theme === "system" ? "Match system" : theme === "dark" ? "Midnight Teal" : "Light"}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 p-1 rounded-full bg-muted">
+              {(["light", "dark", "system"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTheme(t)}
+                  className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition ${
+                    theme === t
+                      ? "bg-card text-foreground shadow-soft"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {t === "light" ? "Light" : t === "dark" ? "Dark" : "Auto"}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Other */}

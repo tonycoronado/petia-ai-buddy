@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 interface Notifications {
   moodReminder: boolean;
@@ -6,6 +6,8 @@ interface Notifications {
   weeklyInsights: boolean;
   marketing: boolean;
 }
+
+type Theme = "light" | "dark" | "system";
 
 interface AppSettings {
   units: "kg" | "lbs";
@@ -15,15 +17,28 @@ interface AppSettings {
   trialActive: boolean;
   trialDaysLeft: number;
   notifications: Notifications;
+  theme: Theme;
   setUnits: (u: "kg" | "lbs") => void;
   setLanguage: (l: "EN" | "ES") => void;
   setAiEnabled: (v: boolean) => void;
   setIsPremium: (v: boolean) => void;
   startTrial: () => void;
   toggleNotification: (key: keyof Notifications) => void;
+  setTheme: (t: Theme) => void;
 }
 
 const Ctx = createContext<AppSettings | null>(null);
+
+const THEME_KEY = "petia-theme";
+
+const applyTheme = (theme: Theme) => {
+  const root = document.documentElement;
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+  root.classList.toggle("dark", isDark);
+};
 
 export const AppSettingsProvider = ({ children }: { children: ReactNode }) => {
   const [units, setUnits] = useState<"kg" | "lbs">("kg");
@@ -38,6 +53,22 @@ export const AppSettingsProvider = ({ children }: { children: ReactNode }) => {
     weeklyInsights: true,
     marketing: false,
   });
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "light";
+    return (localStorage.getItem(THEME_KEY) as Theme) || "light";
+  });
+
+  useEffect(() => {
+    applyTheme(theme);
+    localStorage.setItem(THEME_KEY, theme);
+    if (theme !== "system") return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => applyTheme("system");
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [theme]);
+
+  const setTheme = (t: Theme) => setThemeState(t);
 
   const startTrial = () => {
     setTrialActive(true);
@@ -58,12 +89,14 @@ export const AppSettingsProvider = ({ children }: { children: ReactNode }) => {
         trialActive,
         trialDaysLeft,
         notifications,
+        theme,
         setUnits,
         setLanguage,
         setAiEnabled,
         setIsPremium,
         startTrial,
         toggleNotification,
+        setTheme,
       }}
     >
       {children}
