@@ -1,34 +1,48 @@
-## Mockups dark mode — Petia
+## Implementación: Dark Mode "Midnight Teal"
 
-Genero **6 mockups PNG** (mobile, 9:16) sin tocar el código de la app. Solo exploración visual.
+Implemento el toggle dark/light real en la app, basado en el mockup Midnight Teal aprobado.
 
-### Estilo A — Midnight Teal
-Fondo `#0B1416` casi negro azulado. Glass oscuro translúcido (`white/5` con blur). Acento teal `#20B2AA` brillante. Lavanda apagada. Tipografía blanca pura para títulos, gris claro para body. Sensación: premium, sobrio, Apple-like.
+### 1. Tokens HSL en `src/index.css`
+Agrego el bloque `.dark` con la paleta Midnight Teal:
+- `--background: 195 35% 7%` (#0B1416 navy-black)
+- `--foreground: 0 0% 98%` (blanco)
+- `--card: 195 30% 10%` glass base
+- `--muted: 195 20% 14%`, `--muted-foreground: 215 15% 65%`
+- `--primary: 174 72% 56%` (teal #20B2AA brillante para mejor contraste sobre fondo oscuro)
+- `--secondary: 195 25% 16%`
+- `--border: 0 0% 100% / 0.08` → mejor: `--border: 195 20% 20%`
+- `--destructive`, `--warning`, `--ring` ajustados
 
-### Estilo B — Deep Lavender Night
-Fondo violeta profundo `#13101F`. Glass con tinte lavanda (`#E6E6FA` al 8%). Gradientes lavanda→teal vibrantes y luminosos. Mantiene el ADN Gen-Z actual pero en modo noche cálido.
+### 2. Utilidades dark-aware en `index.css`
+`glass` y `glass-dark` actualmente hardcodean `bg-white/80`. Las migro a tokens:
+- `.glass` → light: `bg-white/80`, dark: `bg-white/5 backdrop-blur-2xl border-white/10`
+- Sombras (`--shadow-soft`, `--shadow-glow`) ajustadas para dark (sombras más sutiles, glow teal más fuerte)
+- Gradientes `--gradient-accent` y `gradient-cta` se mantienen (teal/lavanda funcionan en ambos)
 
-### Pantallas (las 3 principales)
-Cada estilo cubre:
-1. **Today** — header con bubble del pet activo, mood selector (5 estados), hero "Needs attention", For-you rows, Emergency Vet button rojo, bottom nav flotante.
-2. **Smart Capture** — viewfinder central con CTA gigante de cámara, chips de "Food / Health / Vet doc", sample thumbnails, AI consent badge.
-3. **Care** — AI Smart Suggestions card, Weekly Insights row con badge Premium, AI Care Chat, Expenses (premium gate).
+### 3. Theme provider
+Extiendo `src/lib/appSettings.tsx` con:
+- `theme: "light" | "dark" | "system"`
+- `setTheme(t)`
+- `useEffect` que aplica/quita la clase `.dark` en `document.documentElement` y respeta `prefers-color-scheme` cuando es `system`
+- Persistencia en `localStorage` (clave `petia-theme`)
 
-Todos respetan la IA aprobada, glass cards, super-rounded (`rounded-4xl/5xl`), shadows suaves, bottom nav pill flotante con CTA gradient en el centro, y tipografía Inter black.
+### 4. Toggle en Account
+En `src/components/petia/account/AccountSheet.tsx`, dentro de "Preferences" agrego una nueva fila **Appearance** con 3 chips segmentados: Light · Dark · System. Mismo estilo que el toggle de unidades existente.
 
-### Entrega
-6 archivos en `/mnt/documents/`:
-- `petia-dark-midnight-today.png`
-- `petia-dark-midnight-capture.png`
-- `petia-dark-midnight-care.png`
-- `petia-dark-lavender-today.png`
-- `petia-dark-lavender-capture.png`
-- `petia-dark-lavender-care.png`
+### 5. Auditoría rápida de literales
+Hay ~85 usos de `bg-white` hardcodeados. La mayoría dentro de `.glass` ya queda resuelta por la utility. Reviso solo los outliers críticos (chips activos, badges premium, splash screen) y los migro a tokens cuando rompan en dark. No reescribo screens enteras: el sistema de tokens ya cubre 90%.
 
-Renderizados como `<lov-artifact>` para que los compares lado a lado y elijas el ganador (o pidas ajustes) antes de cualquier implementación.
+Pantallas que verifico visualmente tras el toggle:
+- Today, Health, Capture, Care, Account
+- Onboarding (Welcome, Basics)
+- Paywall
+- Splash
 
-### Detalles técnicos
-- Generación con `imagegen` (modelo premium para legibilidad de UI text).
-- Aspect ratio 9:16, 1024×1820 aprox.
-- Sin cambios al codebase. Cero migrations. Cero tokens nuevos en `index.css`.
-- Si después apruebas un estilo, en un segundo loop puedo implementar el toggle dark/light real con CSS variables HSL en `.dark`.
+### Lo que NO incluye
+- No cambio la IA, navegación, ni features
+- No toco mockClassifier ni datos
+- No agrego nuevas secciones a Account más allá del toggle
+- No migration ni backend (zero-backend prototype)
+
+### Resultado
+El usuario puede cambiar entre Light / Dark / System desde Account → Preferences → Appearance. Dark mode hereda exactamente el look del mockup Midnight Teal aprobado.
