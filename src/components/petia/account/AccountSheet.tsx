@@ -58,6 +58,8 @@ const AccountSheet = ({
     trialDaysLeft,
     notifications,
     toggleNotification,
+    theme,
+    setTheme,
   } = useAppSettings();
 
   const Row = ({ icon: Icon, label, sub, onClick, right }: any) => (
