@@ -1,48 +1,62 @@
-## Implementación: Dark Mode "Midnight Teal"
+## Recolor: "Pearl & Ruddy" palette
 
-Implemento el toggle dark/light real en la app, basado en el mockup Midnight Teal aprobado.
+I'll replace the current Teal/Lavender system with the 5-color palette you uploaded, keeping the glassmorphism, rounded shapes and warm tone — only the color tokens change.
 
-### 1. Tokens HSL en `src/index.css`
-Agrego el bloque `.dark` con la paleta Midnight Teal:
-- `--background: 195 35% 7%` (#0B1416 navy-black)
-- `--foreground: 0 0% 98%` (blanco)
-- `--card: 195 30% 10%` glass base
-- `--muted: 195 20% 14%`, `--muted-foreground: 215 15% 65%`
-- `--primary: 174 72% 56%` (teal #20B2AA brillante para mejor contraste sobre fondo oscuro)
-- `--secondary: 195 25% 16%`
-- `--border: 0 0% 100% / 0.08` → mejor: `--border: 195 20% 20%`
-- `--destructive`, `--warning`, `--ring` ajustados
+### Palette mapping
 
-### 2. Utilidades dark-aware en `index.css`
-`glass` y `glass-dark` actualmente hardcodean `bg-white/80`. Las migro a tokens:
-- `.glass` → light: `bg-white/80`, dark: `bg-white/5 backdrop-blur-2xl border-white/10`
-- Sombras (`--shadow-soft`, `--shadow-glow`) ajustadas para dark (sombras más sutiles, glow teal más fuerte)
-- Gradientes `--gradient-accent` y `gradient-cta` se mantienen (teal/lavanda funcionan en ambos)
+| Role | Color | Hex |
+|---|---|---|
+| Light background | Pearl | `#EAE0C7` |
+| Light surface / card | Warm white | `#FBF7EE` |
+| Light text | Raisin Black | `#2E211C` |
+| Primary (CTAs, active) | Ruddy Brown | `#C06226` |
+| Primary deep / pressed | Saddle Brown | `#984619` |
+| Secondary surface / accent | Cambridge Blue | `#9CB8B7` |
+| Dark background | Raisin Black | `#2E211C` |
+| Dark surface | Slightly lifted Raisin | `#3A2A23` |
+| Dark primary | Ruddy Brown (brightened) | `#D87A3F` |
+| Dark accent | Cambridge Blue | `#9CB8B7` |
 
-### 3. Theme provider
-Extiendo `src/lib/appSettings.tsx` con:
-- `theme: "light" | "dark" | "system"`
-- `setTheme(t)`
-- `useEffect` que aplica/quita la clase `.dark` en `document.documentElement` y respeta `prefers-color-scheme` cuando es `system`
-- Persistencia en `localStorage` (clave `petia-theme`)
+Gradients:
+- `gradient-accent`: Pearl → Cambridge Blue (calm, header glows)
+- `gradient-cta`: Ruddy Brown → Saddle Brown (buttons, capture FAB, premium)
 
-### 4. Toggle en Account
-En `src/components/petia/account/AccountSheet.tsx`, dentro de "Preferences" agrego una nueva fila **Appearance** con 3 chips segmentados: Light · Dark · System. Mismo estilo que el toggle de unidades existente.
+### Files I will edit
 
-### 5. Auditoría rápida de literales
-Hay ~85 usos de `bg-white` hardcodeados. La mayoría dentro de `.glass` ya queda resuelta por la utility. Reviso solo los outliers críticos (chips activos, badges premium, splash screen) y los migro a tokens cuando rompan en dark. No reescribo screens enteras: el sistema de tokens ya cubre 90%.
+1. **`src/index.css`** — full token rewrite for `:root` and `.dark`:
+   - `--background`, `--foreground`, `--card`, `--popover`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--warning`, `--border`, `--input`, `--ring` (all HSL).
+   - `--gradient-accent` → Pearl → Cambridge Blue.
+   - `.gradient-cta` utility → Ruddy → Saddle.
+   - `--shadow-glow` → warm Ruddy glow `rgba(192,98,38,.25)`.
+   - `.glass` light: `bg-[#FBF7EE]/80 border-white/60`. Dark: `bg-white/[0.04] border-white/10` (unchanged structure).
 
-Pantallas que verifico visualmente tras el toggle:
-- Today, Health, Capture, Care, Account
-- Onboarding (Welcome, Basics)
-- Paywall
-- Splash
+2. **`tailwind.config.ts`** — replace the `petia` brand colors:
+   ```
+   petia: {
+     pearl:     "#EAE0C7",
+     cambridge: "#9CB8B7",
+     ruddy:     "#C06226",
+     saddle:    "#984619",
+     raisin:    "#2E211C",
+   }
+   ```
 
-### Lo que NO incluye
-- No cambio la IA, navegación, ni features
-- No toco mockClassifier ni datos
-- No agrego nuevas secciones a Account más allá del toggle
-- No migration ni backend (zero-backend prototype)
+3. **Hardcoded outliers audit** (only files using literal teal / lavender / `#008080` / `#E6E6FA` / `#20B2AA`):
+   - `src/components/petia/SplashScreen.tsx` — uses `gradient-accent` utility, no literals → no change.
+   - Any component still referencing `petia-teal*` / `petia-lavender` classes will be migrated to the new tokens (`bg-petia-cambridge`, `text-petia-ruddy`, etc.).
+   - Premium badges, paywall accent, active chips, mood ring, capture FAB → verified to use tokens / gradients (already covered).
 
-### Resultado
-El usuario puede cambiar entre Light / Dark / System desde Account → Preferences → Appearance. Dark mode hereda exactamente el look del mockup Midnight Teal aprobado.
+4. **Update Appearance toggle copy** in `src/components/petia/account/AccountSheet.tsx`:
+   - Rename "Dark (Midnight Teal)" → "Dark (Raisin Night)". No logic change.
+
+5. **Memory update** — `mem://style/aesthetic` updated to reflect: "Pearl background, Ruddy Brown CTA, Cambridge Blue accent, Raisin Black ink. Dark mode = Raisin Night." Old "lavender-to-teal" rule removed from Core in `mem://index.md`.
+
+### Out of scope
+
+- No layout, copy, navigation, IA, AI, mockClassifier, data, onboarding flow or feature changes.
+- No new screens or components.
+- No backend.
+
+### Result
+
+Same app, fully repainted in Pearl + Ruddy + Cambridge + Raisin. Light mode reads warm-editorial; dark mode reads cocoa-night with bright Ruddy accents. The Light/Dark/System toggle in Account → Preferences keeps working.
