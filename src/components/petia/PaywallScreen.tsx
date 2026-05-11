@@ -30,7 +30,7 @@ const PaywallScreen = ({ onClose }: PaywallScreenProps) => {
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
       className="fixed inset-0 z-[100] bg-card flex flex-col overflow-y-auto"
     >
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-secondary/50 to-transparent -z-10" />
+      <div className="absolute top-0 left-0 w-full h-96 bg-secondary/50 -z-10" />
 
       <div className="p-8 flex justify-between items-center">
         <span className="inline-flex items-center gap-1.5 text-[10px] font-black px-3 py-1.5 rounded-full bg-primary text-primary-foreground uppercase tracking-widest">

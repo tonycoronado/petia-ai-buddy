@@ -39,7 +39,6 @@
 
     --radius: 2rem;
 
-    --gradient-accent: linear-gradient(135deg, #E6E6FA 0%, #008080 100%);
     --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.08);
     --shadow-glow: 0 20px 40px rgba(0, 128, 128, 0.2);
 
@@ -103,11 +102,11 @@
 
 @layer utilities {
   .gradient-accent {
-    background: linear-gradient(135deg, #E6E6FA 0%, #008080 100%);
+    background: hsl(var(--accent));
   }
 
   .gradient-cta {
-    background: linear-gradient(135deg, #008080 0%, #20B2AA 100%);
+    background: hsl(var(--primary));
   }
 
   .glass {
