@@ -104,15 +104,15 @@
 
 @layer utilities {
   .gradient-accent {
-    background: linear-gradient(135deg, #E6E6FA 0%, #008080 100%);
+    background: linear-gradient(135deg, #EAE0C7 0%, #9CB8B7 100%);
   }
 
   .gradient-cta {
-    background: linear-gradient(135deg, #008080 0%, #20B2AA 100%);
+    background: linear-gradient(135deg, #C06226 0%, #984619 100%);
   }
 
   .glass {
-    @apply bg-white/80 backdrop-blur-2xl border border-white/50;
+    @apply bg-[#FBF7EE]/80 backdrop-blur-2xl border border-white/60;
   }
   .dark .glass {
     @apply bg-white/[0.04] backdrop-blur-2xl border-white/10;
