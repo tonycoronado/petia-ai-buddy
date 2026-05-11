@@ -6,42 +6,43 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 220 26% 14%;
+    /* Pearl & Ruddy palette */
+    --background: 42 44% 85%;          /* Pearl #EAE0C7 */
+    --foreground: 14 24% 15%;          /* Raisin Black #2E211C */
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 26% 14%;
+    --card: 40 60% 96%;                /* Warm white #FBF7EE */
+    --card-foreground: 14 24% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 26% 14%;
+    --popover: 40 60% 96%;
+    --popover-foreground: 14 24% 15%;
 
-    --primary: 180 100% 25%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 21 67% 45%;             /* Ruddy Brown #C06226 */
+    --primary-foreground: 40 60% 96%;
 
-    --secondary: 240 67% 94%;
-    --secondary-foreground: 220 26% 14%;
+    --secondary: 179 19% 67%;          /* Cambridge Blue #9CB8B7 */
+    --secondary-foreground: 14 24% 15%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 14% 55%;
+    --muted: 42 35% 90%;
+    --muted-foreground: 14 12% 35%;
 
-    --accent: 180 100% 25%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 179 19% 67%;
+    --accent-foreground: 14 24% 15%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 14 71% 35%;         /* Saddle Brown #984619 */
+    --destructive-foreground: 40 60% 96%;
 
-    --warning: 45 100% 90%;
-    --warning-foreground: 35 80% 30%;
+    --warning: 42 60% 88%;
+    --warning-foreground: 14 71% 28%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 180 100% 25%;
+    --border: 42 28% 78%;
+    --input: 42 28% 78%;
+    --ring: 21 67% 45%;
 
     --radius: 2rem;
 
-    --gradient-accent: linear-gradient(135deg, #E6E6FA 0%, #008080 100%);
-    --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0 20px 40px rgba(0, 128, 128, 0.2);
+    --gradient-accent: linear-gradient(135deg, #EAE0C7 0%, #9CB8B7 100%);
+    --shadow-soft: 0 20px 50px rgba(46, 33, 28, 0.10);
+    --shadow-glow: 0 20px 40px rgba(192, 98, 38, 0.25);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
