@@ -1,62 +1,72 @@
-## Recolor: "Pearl & Ruddy" palette
+## Recolor: "Amber & Gold" palette
 
-I'll replace the current Teal/Lavender system with the 5-color palette you uploaded, keeping the glassmorphism, rounded shapes and warm tone — only the color tokens change.
+Replace current Pearl & Ruddy tokens with the exact Amber & Gold values you provided. Glassmorphism, rounded shapes, layout, copy and IA all unchanged — only color tokens.
 
-### Palette mapping
+### Token mapping
 
-| Role | Color | Hex |
+**Light mode**
+| Token | HSL | Hex |
 |---|---|---|
-| Light background | Pearl | `#EAE0C7` |
-| Light surface / card | Warm white | `#FBF7EE` |
-| Light text | Raisin Black | `#2E211C` |
-| Primary (CTAs, active) | Ruddy Brown | `#C06226` |
-| Primary deep / pressed | Saddle Brown | `#984619` |
-| Secondary surface / accent | Cambridge Blue | `#9CB8B7` |
-| Dark background | Raisin Black | `#2E211C` |
-| Dark surface | Slightly lifted Raisin | `#3A2A23` |
-| Dark primary | Ruddy Brown (brightened) | `#D87A3F` |
-| Dark accent | Cambridge Blue | `#9CB8B7` |
+| `--background` | `40 30% 97%` | `#FBF9F5` warm cream |
+| `--foreground` | `30 30% 12%` | espresso ink |
+| `--card` | `40 40% 99%` | warm white surface |
+| `--popover` | same as card | — |
+| `--primary` | `35 85% 52%` | `#E8A33F` golden amber |
+| `--primary-foreground` | `40 40% 99%` | — |
+| `--secondary` | `40 60% 94%` | `#F9F0DE` soft gold |
+| `--muted` | `40 30% 93%` | — |
+| `--accent` | `35 85% 52%` | `#E8A33F` |
+| `--destructive` | `0 72% 51%` | `#E23636` |
+| `--warning` | `30 100% 90%` | `#FFF4D9` |
+| `--border` / `--input` | `40 25% 88%` | — |
+| `--ring` | `35 85% 52%` | — |
 
-Gradients:
-- `gradient-accent`: Pearl → Cambridge Blue (calm, header glows)
-- `gradient-cta`: Ruddy Brown → Saddle Brown (buttons, capture FAB, premium)
+**Dark mode — "Amber Night"**
+| Token | HSL | Hex |
+|---|---|---|
+| `--background` | `220 18% 8%` | `#10131A` deep charcoal |
+| `--foreground` | `40 30% 95%` | warm cream ink |
+| `--card` | `220 16% 12%` | `#181C26` |
+| `--popover` | same as card | — |
+| `--primary` | `38 95% 58%` | `#F5B04F` bright gold |
+| `--primary-foreground` | `220 18% 8%` | — |
+| `--secondary` | `220 14% 18%` | `#212530` |
+| `--muted` | `220 12% 22%` | `#2A2E3A` |
+| `--accent` | `38 95% 58%` | bright gold |
+| `--destructive` | `0 72% 55%` | — |
+| `--warning` | `30 60% 22%` | — |
+| `--border` / `--input` | `220 12% 24%` | `#2E323D` |
+| `--ring` | `38 95% 58%` | — |
 
-### Files I will edit
+**Gradients & shadows**
+- `.gradient-accent`: `#FBF9F5 → #F9F0DE` (calm header glows)
+- `.gradient-cta`: `#E8A33F → #C97F1E` (buttons, capture FAB, premium)
+- Light `--shadow-soft`: `0 20px 50px rgba(42,31,18,0.10)`
+- Dark `--shadow-soft`: `0 20px 50px rgba(0,0,0,0.55)`
+- `--shadow-glow` (both): `0 20px 40px rgba(232,163,63,0.35)`
 
-1. **`src/index.css`** — full token rewrite for `:root` and `.dark`:
-   - `--background`, `--foreground`, `--card`, `--popover`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--warning`, `--border`, `--input`, `--ring` (all HSL).
-   - `--gradient-accent` → Pearl → Cambridge Blue.
-   - `.gradient-cta` utility → Ruddy → Saddle.
-   - `--shadow-glow` → warm Ruddy glow `rgba(192,98,38,.25)`.
-   - `.glass` light: `bg-[#FBF7EE]/80 border-white/60`. Dark: `bg-white/[0.04] border-white/10` (unchanged structure).
+### Files to edit
 
-2. **`tailwind.config.ts`** — replace the `petia` brand colors:
+1. **`src/index.css`** — full HSL token rewrite for `:root` and `.dark` per tables above. Update `.gradient-accent`, `.gradient-cta`, and `.glass` (light: `bg-[#FFFDF7]/80 border-white/60`; dark: `bg-white/[0.04] border-white/10`).
+
+2. **`tailwind.config.ts`** — replace `petia` brand palette:
    ```
    petia: {
-     pearl:     "#EAE0C7",
-     cambridge: "#9CB8B7",
-     ruddy:     "#C06226",
-     saddle:    "#984619",
-     raisin:    "#2E211C",
+     cream:    "#FBF9F5",
+     gold:     "#F9F0DE",
+     amber:    "#E8A33F",
+     burnt:    "#C97F1E",
+     espresso: "#10131A",
+     // back-compat aliases (lavender, teal, navy) repointed to new palette
    }
    ```
 
-3. **Hardcoded outliers audit** (only files using literal teal / lavender / `#008080` / `#E6E6FA` / `#20B2AA`):
-   - `src/components/petia/SplashScreen.tsx` — uses `gradient-accent` utility, no literals → no change.
-   - Any component still referencing `petia-teal*` / `petia-lavender` classes will be migrated to the new tokens (`bg-petia-cambridge`, `text-petia-ruddy`, etc.).
-   - Premium badges, paywall accent, active chips, mood ring, capture FAB → verified to use tokens / gradients (already covered).
+3. **`src/components/petia/account/AccountSheet.tsx`** — rename Dark label "Raisin Night" → "Amber Night".
 
-4. **Update Appearance toggle copy** in `src/components/petia/account/AccountSheet.tsx`:
-   - Rename "Dark (Midnight Teal)" → "Dark (Raisin Night)". No logic change.
-
-5. **Memory update** — `mem://style/aesthetic` updated to reflect: "Pearl background, Ruddy Brown CTA, Cambridge Blue accent, Raisin Black ink. Dark mode = Raisin Night." Old "lavender-to-teal" rule removed from Core in `mem://index.md`.
+4. **Memory updates**:
+   - `mem://style/aesthetic` — rewrite to Amber & Gold (light cream + amber, dark Amber Night charcoal, glass rules).
+   - `mem://index.md` — Core line updated to reflect new palette.
 
 ### Out of scope
 
-- No layout, copy, navigation, IA, AI, mockClassifier, data, onboarding flow or feature changes.
-- No new screens or components.
-- No backend.
-
-### Result
-
-Same app, fully repainted in Pearl + Ruddy + Cambridge + Raisin. Light mode reads warm-editorial; dark mode reads cocoa-night with bright Ruddy accents. The Light/Dark/System toggle in Account → Preferences keeps working.
+No layout, copy, navigation, IA, AI, mockClassifier, data, onboarding, or backend changes. Light/Dark/System toggle keeps working.
