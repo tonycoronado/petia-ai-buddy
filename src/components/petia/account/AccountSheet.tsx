@@ -186,7 +186,7 @@ const AccountSheet = ({
             <div className="flex-1 min-w-0">
               <p className="font-bold text-foreground text-sm">Appearance</p>
               <p className="text-[11px] text-muted-foreground font-medium truncate">
-                {theme === "system" ? "Match system" : theme === "dark" ? "Midnight Teal" : "Light"}
+                {theme === "system" ? "Match system" : theme === "dark" ? "Raisin Night" : "Light"}
               </p>
             </div>
             <div className="flex items-center gap-1 p-1 rounded-full bg-muted">

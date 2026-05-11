@@ -65,10 +65,16 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         petia: {
-          lavender: "#E6E6FA",
-          teal: "#008080",
-          "teal-light": "#20B2AA",
-          navy: "#1A202C",
+          pearl: "#EAE0C7",
+          cambridge: "#9CB8B7",
+          ruddy: "#C06226",
+          saddle: "#984619",
+          raisin: "#2E211C",
+          // Back-compat aliases
+          lavender: "#EAE0C7",
+          teal: "#C06226",
+          "teal-light": "#D87A3F",
+          navy: "#2E211C",
         },
       },
       borderRadius: {

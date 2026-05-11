@@ -6,42 +6,43 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 220 26% 14%;
+    /* Pearl & Ruddy palette */
+    --background: 42 44% 85%;          /* Pearl #EAE0C7 */
+    --foreground: 14 24% 15%;          /* Raisin Black #2E211C */
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 26% 14%;
+    --card: 40 60% 96%;                /* Warm white #FBF7EE */
+    --card-foreground: 14 24% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 26% 14%;
+    --popover: 40 60% 96%;
+    --popover-foreground: 14 24% 15%;
 
-    --primary: 180 100% 25%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 21 67% 45%;             /* Ruddy Brown #C06226 */
+    --primary-foreground: 40 60% 96%;
 
-    --secondary: 240 67% 94%;
-    --secondary-foreground: 220 26% 14%;
+    --secondary: 179 19% 67%;          /* Cambridge Blue #9CB8B7 */
+    --secondary-foreground: 14 24% 15%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 14% 55%;
+    --muted: 42 35% 90%;
+    --muted-foreground: 14 12% 35%;
 
-    --accent: 180 100% 25%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 179 19% 67%;
+    --accent-foreground: 14 24% 15%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 14 71% 35%;         /* Saddle Brown #984619 */
+    --destructive-foreground: 40 60% 96%;
 
-    --warning: 45 100% 90%;
-    --warning-foreground: 35 80% 30%;
+    --warning: 42 60% 88%;
+    --warning-foreground: 14 71% 28%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 180 100% 25%;
+    --border: 42 28% 78%;
+    --input: 42 28% 78%;
+    --ring: 21 67% 45%;
 
     --radius: 2rem;
 
-    --gradient-accent: linear-gradient(135deg, #E6E6FA 0%, #008080 100%);
-    --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0 20px 40px rgba(0, 128, 128, 0.2);
+    --gradient-accent: linear-gradient(135deg, #EAE0C7 0%, #9CB8B7 100%);
+    --shadow-soft: 0 20px 50px rgba(46, 33, 28, 0.10);
+    --shadow-glow: 0 20px 40px rgba(192, 98, 38, 0.25);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -54,31 +55,31 @@
   }
 
   .dark {
-    /* Midnight Teal palette */
-    --background: 195 35% 7%;
-    --foreground: 0 0% 98%;
-    --card: 195 30% 11%;
-    --card-foreground: 0 0% 98%;
-    --popover: 195 30% 11%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 174 72% 56%;
-    --primary-foreground: 195 40% 8%;
-    --secondary: 195 25% 16%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 195 22% 14%;
-    --muted-foreground: 200 12% 68%;
-    --accent: 174 72% 56%;
-    --accent-foreground: 195 40% 8%;
-    --destructive: 0 78% 62%;
-    --destructive-foreground: 0 0% 100%;
-    --warning: 35 80% 18%;
-    --warning-foreground: 45 100% 78%;
-    --border: 195 20% 20%;
-    --input: 195 22% 16%;
-    --ring: 174 72% 56%;
+    /* Raisin Night palette */
+    --background: 14 24% 12%;          /* Raisin Black #2E211C */
+    --foreground: 40 50% 94%;          /* Pearl-white */
+    --card: 14 22% 17%;                /* Lifted raisin #3A2A23 */
+    --card-foreground: 40 50% 94%;
+    --popover: 14 22% 17%;
+    --popover-foreground: 40 50% 94%;
+    --primary: 22 67% 55%;             /* Brightened Ruddy #D87A3F */
+    --primary-foreground: 14 24% 12%;
+    --secondary: 179 19% 50%;          /* Cambridge Blue (deeper) */
+    --secondary-foreground: 40 50% 94%;
+    --muted: 14 18% 20%;
+    --muted-foreground: 40 20% 72%;
+    --accent: 179 25% 60%;
+    --accent-foreground: 14 24% 12%;
+    --destructive: 14 71% 50%;
+    --destructive-foreground: 40 50% 94%;
+    --warning: 35 60% 22%;
+    --warning-foreground: 42 80% 78%;
+    --border: 14 18% 24%;
+    --input: 14 18% 22%;
+    --ring: 22 67% 55%;
 
-    --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 20px 40px rgba(32, 178, 170, 0.35);
+    --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.55);
+    --shadow-glow: 0 20px 40px rgba(216, 122, 63, 0.35);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -103,15 +104,15 @@
 
 @layer utilities {
   .gradient-accent {
-    background: linear-gradient(135deg, #E6E6FA 0%, #008080 100%);
+    background: linear-gradient(135deg, #EAE0C7 0%, #9CB8B7 100%);
   }
 
   .gradient-cta {
-    background: linear-gradient(135deg, #008080 0%, #20B2AA 100%);
+    background: linear-gradient(135deg, #C06226 0%, #984619 100%);
   }
 
   .glass {
-    @apply bg-white/80 backdrop-blur-2xl border border-white/50;
+    @apply bg-[#FBF7EE]/80 backdrop-blur-2xl border border-white/60;
   }
   .dark .glass {
     @apply bg-white/[0.04] backdrop-blur-2xl border-white/10;
